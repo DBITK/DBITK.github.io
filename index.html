@@ -45,6 +45,8 @@
 
 html { scroll-behavior: smooth; }
 
+html, body { overflow-x: hidden; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -151,11 +153,23 @@ h1 .surname {
   font-size: 14px;
   color: var(--fg-muted);
   margin: 0 0 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 6px;
 }
-.contact-line a { color: var(--fg); }
+.contact-line a {
+  color: var(--fg);
+  white-space: nowrap;          /* keep each link unbroken */
+}
 .contact-line .sep {
   color: var(--rule-hi);
   margin: 0 .55em;
+}
+@media (max-width: 480px) {
+  /* dots dangle at line breaks on narrow screens — let flex gap do the spacing */
+  .contact-line .sep { display: none; }
+  .contact-line { column-gap: 14px; }
 }
 
 /* ---------- generic ---------- */
@@ -225,6 +239,19 @@ ul.entries .meta {
   font-size: 13px;
   color: var(--fg-muted);
   letter-spacing: .02em;
+}
+/* On narrow screens, stack metadata under its title — avoids dangling
+   separators when "· Company · Date" wraps awkwardly. */
+@media (max-width: 560px) {
+  ul.entries .meta {
+    display: block;
+    margin-top: 2px;
+  }
+  ul.entries .meta--exp::before { content: ""; }   /* hide injected leading dot */
+}
+ul.entries .meta--exp::before {
+  content: "· ";
+  color: var(--rule-hi);
 }
 ul.entries p {
   margin: 4px 0 0;
@@ -428,7 +455,7 @@ footer p { margin: 0; color: var(--fg-muted); }
 
     <ul class="entries">
       <li>
-        <div><span class="title">DevOps Engineer</span> <span class="meta">· Revenue Solutions, Inc. · Feb 2021 &ndash; present</span></div>
+        <div><span class="title">DevOps Engineer</span> <span class="meta meta--exp">Revenue Solutions, Inc. · Feb 2021 &ndash; present</span></div>
         <p>
           Building and maintaining multi-environment delivery infrastructure
           for enterprise tax and revenue applications serving government
@@ -454,7 +481,7 @@ footer p { margin: 0; color: var(--fg-muted); }
       </li>
 
       <li>
-        <div><span class="title">Systems Engineer II</span> <span class="meta">· D9 Technologies · May 2020 &ndash; Jan 2021</span></div>
+        <div><span class="title">Systems Engineer II</span> <span class="meta meta--exp">D9 Technologies · May 2020 &ndash; Jan 2021</span></div>
         <p>
           Provisioned and maintained customer environments using Windows
           Server, VMware, and Hyper-V. Conducted security monitoring via Sophos
@@ -463,7 +490,7 @@ footer p { margin: 0; color: var(--fg-muted); }
       </li>
 
       <li>
-        <div><span class="title">B.S., Information Technology</span> <span class="meta">· Central Michigan University · Aug 2019</span></div>
+        <div><span class="title">B.S., Information Technology</span> <span class="meta meta--exp">Central Michigan University · Aug 2019</span></div>
         <p>
           Specialization in Systems Administration and Networking; Dean&rsquo;s
           List. Research at the DISCR Lab on LoRaWAN IoT network infrastructure
