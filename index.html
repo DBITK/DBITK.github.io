@@ -4,11 +4,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Derek Bartlett</title>
-<meta name="description" content="Derek Bartlett — Platform-focused DevOps engineer in Grand Rapids, Michigan." />
+<meta name="description" content="Derek Bartlett — platform-focused DevOps engineer building and operating multi-environment delivery systems at scale." />
 <meta name="author" content="Derek Bartlett" />
 <meta property="og:type"        content="website" />
 <meta property="og:title"       content="Derek Bartlett" />
-<meta property="og:description" content="Platform-focused DevOps engineer in Grand Rapids, Michigan." />
+<meta property="og:description" content="Derek Bartlett — platform-focused DevOps engineer building and operating multi-environment delivery systems at scale." />
 <meta property="og:url"         content="https://derekbartlett.com" />
 <meta name="theme-color"        content="#14110f" />
 
@@ -314,20 +314,15 @@ footer p { margin: 0; color: var(--fg-muted); }
   </header>
 
   <p class="lede">
-    Platform-focused DevOps engineer in Grand Rapids, Michigan. Seven years
-    keeping multi-environment delivery infrastructure running for
-    government-facing production systems, currently working toward a dedicated
-    platform engineering role.
+    Platform-focused engineer building and operating multi-environment delivery systems at scale. Seven years keeping government-facing production infrastructure running across ~70 environments, currently transitioning into a dedicated platform engineering role.
   </p>
 
   <p class="contact-line">
-    <a href="mailto:mail@derekbartlett.com">mail@derekbartlett.com</a>
+    <a href="mailto:derek@derekbartlett.com">derek@derekbartlett.com</a>
     <span class="sep">·</span>
-    <a href="https://github.com/DBITK">github</a>
+    <a href="https://github.com/DBITK" target="_blank" rel="noopener">github</a>
     <span class="sep">·</span>
-    <a href="https://www.linkedin.com/in/DBIT">linkedin</a>
-    <span class="sep">·</span>
-    <a href="https://www.twitch.tv/klatjesus" target="_blank" rel="noopener" data-twitch>twitch</a>
+    <a href="https://www.linkedin.com/in/DBIT" target="_blank" rel="noopener">linkedin</a>
   </p>
 
   <hr class="metal" />
@@ -357,8 +352,7 @@ footer p { margin: 0; color: var(--fg-muted); }
   <section>
     <h2>Projects</h2>
     <p class="muted" style="margin-bottom: 22px;">
-      A few things I&rsquo;ve built or run. Some retired, some live, all worth
-      asking me about.
+      Representative systems I’ve built, operated, or used to sharpen platform engineering skills.
     </p>
 
     <ul class="entries">
@@ -403,14 +397,14 @@ footer p { margin: 0; color: var(--fg-muted); }
         </p>
       </li>
 
-      <li>
+      <!--<li>
         <div><span class="title">Twitch</span> <span class="meta">— live</span></div>
         <p>
           Streaming gaming on a regular cadence. Partly the fun of it,
           partly an excuse to keep tweaking the home A/V and encoding stack
           like it&rsquo;s any other piece of infra. <a href="https://www.twitch.tv/klatjesus" target="_blank" rel="noopener" data-twitch>Watch</a>.
         </p>
-      </li>
+      </li>-->
     </ul>
   </section>
 
@@ -465,7 +459,7 @@ footer p { margin: 0; color: var(--fg-muted); }
           release.
         </p>
         <p>
-          Designed and maintain Azure DevOps release pipelines executing daily
+          Design and maintain Azure DevOps release pipelines executing daily
           deployments across all client environments, supporting ten to fifteen
           developers with environment-specific configuration. Built developer
           self-service tooling and environment reset utilities to remove ops
@@ -521,11 +515,11 @@ footer p { margin: 0; color: var(--fg-muted); }
   <section>
     <h2>Contact</h2>
     <p>
-      Email is best: <a href="mailto:mail@derekbartlett.com">mail@derekbartlett.com</a>.
+      Best way to reach me: <a href="mailto:derek@derekbartlett.com">derek@derekbartlett.com</a>.
       You can also reach me on
-      <a href="https://www.linkedin.com/in/DBIT">LinkedIn</a>,
+      <a href="https://www.linkedin.com/in/DBIT" target="_blank" rel="noopener">LinkedIn</a>,
       catch the code experiments on
-      <a href="https://github.com/DBITK">GitHub</a>,
+      <a href="https://github.com/DBITK" target="_blank" rel="noopener">GitHub</a>,
       or watch a stream on <a href="https://www.twitch.tv/klatjesus" target="_blank" rel="noopener" data-twitch>Twitch</a>.
     </p>
   </section>
@@ -539,27 +533,7 @@ footer p { margin: 0; color: var(--fg-muted); }
 <script>
   // Year auto-update
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  // Twitch link guard — set window.TWITCH_URL or replace data-twitch hrefs directly
-  (function () {
-    var links = document.querySelectorAll('[data-twitch]');
-    if (window.TWITCH_URL) {
-      links.forEach(function (a) {
-        a.href = window.TWITCH_URL;
-        a.target = '_blank';
-        a.rel = 'noopener';
-      });
-    } else {
-      links.forEach(function (a) {
-        a.addEventListener('click', function (e) {
-          if (a.getAttribute('href') === '#') {
-            e.preventDefault();
-            alert('Twitch link not set yet — open index.html and replace href="#" on Twitch links with your channel URL.');
-          }
-        });
-      });
-    }
-  })();
+  
 </script>
 
 </body>
