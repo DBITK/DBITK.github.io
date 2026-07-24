@@ -4,12 +4,14 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Derek Bartlett</title>
-<meta name="description" content="Derek Bartlett — platform-focused engineer building and operating multi-environment delivery systems at scale." />
+<meta name="description" content="Derek Bartlett — platform and DevOps engineer building multi-environment delivery systems, progressive delivery pipelines, and the tooling that lets developers self-serve." />
 <meta name="author" content="Derek Bartlett" />
 <meta property="og:type"        content="website" />
 <meta property="og:title"       content="Derek Bartlett" />
-<meta property="og:description" content="Derek Bartlett — platform-focused engineer building and operating multi-environment delivery systems at scale." />
+<meta property="og:description" content="Derek Bartlett — platform and DevOps engineer building multi-environment delivery systems, progressive delivery pipelines, and the tooling that lets developers self-serve." />
 <meta property="og:url"         content="https://derekbartlett.com" />
+<meta property="og:image"       content="https://derekbartlett.com/photo.jpg" />
+<meta name="twitter:card"       content="summary" />
 <meta name="theme-color"        content="#14110f" />
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='14' fill='%2314110f'/%3E%3Ctext x='50' y='66' font-family='Georgia,serif' font-size='52' font-style='italic' text-anchor='middle' fill='%23c4202c'%3Edb%3C/text%3E%3C/svg%3E" />
@@ -257,6 +259,34 @@ ul.entries p {
   margin: 4px 0 0;
 }
 
+/* The one entry a visitor can actually click into and use. Marked with a
+   single metallic rule rather than a card — the rest of the page earns its
+   emphasis from typography, and a box here would fight that. */
+ul.entries > li.featured {
+  border-left: 2px solid var(--red-deep);
+  padding-left: 18px;
+  margin-left: -20px;
+}
+@media (max-width: 560px) {
+  ul.entries > li.featured { margin-left: 0; padding-left: 14px; }
+}
+
+ul.entries .links {
+  font-family: var(--mono);
+  font-size: 13px;
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 4px;
+}
+ul.entries .links a { white-space: nowrap; }
+ul.entries .links .sep { color: var(--rule-hi); margin: 0 .55em; }
+@media (max-width: 480px) {
+  ul.entries .links .sep { display: none; }
+  ul.entries .links { column-gap: 14px; }
+}
+
 /* "now" status dot — gentle pulse, communicates "currently active" */
 .now-dot {
   display: inline-block;
@@ -341,6 +371,12 @@ footer p { margin: 0; color: var(--fg-muted); }
       to round out the platform engineering side.
     </p>
     <p>
+      Most recently built <a href="https://derekbartlett.com/golden-path-pipeline/">Golden Path</a>
+      &mdash; a deployment pipeline that judges a release on statistics rather than
+      on someone squinting at a dashboard. It is the piece of my day job I find
+      most interesting, rebuilt somewhere I could take it further.
+    </p>
+    <p>
       Open to new roles. The right fit is somewhere I can build the
       paved path rather than just walk it.
     </p>
@@ -356,6 +392,33 @@ footer p { margin: 0; color: var(--fg-muted); }
     </p>
 
     <ul class="entries">
+      <li class="featured">
+        <div><span class="title">Golden Path</span> <span class="meta">— live, try it</span></div>
+        <p>
+          A deployment pipeline that decides <em>statistically</em> whether a build
+          is allowed to reach production. Each environment deploys a fresh baseline
+          alongside the candidate, drives identical load through both at the same
+          time, and judges the result with a Mann&ndash;Whitney U test and an
+          effect-size gate before performing a red/black traffic switch &mdash; the
+          automated canary analysis Netflix built Kayenta for, implemented from
+          scratch rather than described.
+        </p>
+        <p>
+          The delivery config is declarative: teams state requirements and the
+          orchestrator derives the steps. A weekly drill deliberately ships broken
+          builds and <strong>fails if they get promoted</strong>. The same config
+          compiles to Argo Rollouts manifests, because the methodology outlived the
+          tool it came from.
+        </p>
+        <p class="links">
+          <a href="https://derekbartlett.com/golden-path-pipeline/">interactive demo</a>
+          <span class="sep">·</span>
+          <a href="https://github.com/DBITK/golden-path-pipeline" target="_blank" rel="noopener">source</a>
+          <span class="sep">·</span>
+          <a href="https://github.com/DBITK/golden-path-pipeline/actions" target="_blank" rel="noopener">run the pipeline yourself</a>
+        </p>
+      </li>
+
       <li>
         <div><span class="title">Self-hosted homelab</span> <span class="meta">— retired</span></div>
         <p>
@@ -414,9 +477,16 @@ footer p { margin: 0; color: var(--fg-muted); }
   <section>
     <h2>Skills</h2>
     <p>
-      <strong>CI/CD &amp; DevOps.</strong> Azure DevOps end-to-end
-      &mdash; Pipelines, Repos, Boards, work-item customization. Release
-      management, SDLC process design, JAMS scheduling.
+      <strong>Delivery &amp; release engineering.</strong> Azure DevOps end-to-end
+      &mdash; Pipelines, Repos, Boards, work-item customization. GitHub Actions.
+      Release management, SDLC process design, JAMS scheduling.
+    </p>
+    <p>
+      <strong>Progressive delivery.</strong> Automated canary analysis, red/black
+      deployments, and declarative promotion gates. Built the statistical judge
+      behind <a href="https://derekbartlett.com/golden-path-pipeline/">Golden Path</a>
+      &mdash; rank-based significance testing with effect-size gating &mdash; and
+      the mapping from that model onto Argo Rollouts.
     </p>
     <p>
       <strong>Cloud &amp; IaC.</strong> Azure and AWS in production. Terraform
@@ -428,8 +498,9 @@ footer p { margin: 0; color: var(--fg-muted); }
     </p>
     <p>
       <strong>Scripting.</strong> PowerShell as a first language for tooling.
-      SQL daily. .NET deployment pipelines. Working exposure to JavaScript,
-      Python, React, and HTML/CSS.
+      Python for delivery tooling &mdash; the Golden Path orchestrator, its
+      statistics, and its test suite. SQL daily. .NET deployment pipelines.
+      Working exposure to JavaScript, React, and HTML/CSS.
     </p>
     <p>
       <strong>Data &amp; observability.</strong> SQL Server, SSRS, SSIS.
