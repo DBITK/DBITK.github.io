@@ -13,594 +13,2730 @@
 <meta property="og:image"       content="https://derekbartlett.com/photo.jpg" />
 <meta name="twitter:card"       content="summary" />
 <meta name="theme-color"        content="#14110f" />
-
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='14' fill='%2314110f'/%3E%3Ctext x='50' y='66' font-family='Georgia,serif' font-size='52' font-style='italic' text-anchor='middle' fill='%23c4202c'%3Edb%3C/text%3E%3C/svg%3E" />
 
 <style>
-/* ===========================================================
-   Derek Bartlett — personal site
-   Single column, serif typography, sparse decoration.
-   Influenced by mitchellh.com.
-   =========================================================== */
-
-:root {
-  --bg:        #14110f;       /* warm near-black */
-  --bg-soft:   #1a1614;       /* almost imperceptible elevation */
-  --fg:        #ece6dc;       /* warm off-white */
-  --fg-soft:   #b9b0a2;       /* muted body */
-  --fg-muted:  #7a7165;       /* dates, captions */
-  --rule:      #2a2520;       /* hairline */
-  --rule-hi:   #3a3328;
-
-  --red:       #c4202c;       /* metallic base */
-  --red-hot:   #e8475c;       /* hover */
-  --red-deep:  #7a0e1c;       /* shadow stop */
-
-  --serif: "Iowan Old Style", "Apple Garamond", Charter, "Source Serif 4",
-           "Source Serif Pro", "Newsreader", Cambria, Georgia, "Times New Roman", serif;
-  --mono:  ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
-
-  --measure: 38rem;            /* ~608px reading column */
+/* =============================================================
+   RESET & BASE
+   ============================================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 20 24'%3E%3Cpath d='M1 1 L1 19 L5 14 L8 22 L11 21 L8 13 L14 13 Z' fill='%23111' stroke='%23fff' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath d='M2 3 L2 17 L5 13 L8 20 L10 19.5 L7 12 L13 12 Z' fill='white'/%3E%3Cpath d='M3 4 L3 16 L5.5 13 L8.5 19 L9.5 18.5 L6.5 11.5 L12 11.5 Z' fill='%23111'/%3E%3C/svg%3E") 1 1, default !important;
+}
+a, button, [role="button"], .desktop-icon, .win-close, .win-minimize, .taskbar-tab, .start-btn, .explorer-row {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 20 24'%3E%3Cpath d='M1 1 L1 19 L5 14 L8 22 L11 21 L8 13 L14 13 Z' fill='%23111' stroke='%23c4202c' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath d='M2 3 L2 17 L5 13 L8 20 L10 19.5 L7 12 L13 12 Z' fill='%23c4202c'/%3E%3Cpath d='M3 4 L3 16 L5.5 13 L8.5 19 L9.5 18.5 L6.5 11.5 L12 11.5 Z' fill='%23111'/%3E%3C/svg%3E") 1 1, pointer !important;
 }
 
-* { box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
-
-html, body { overflow-x: hidden; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--serif);
-  font-size: 19px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  /* Soft fade-in on first paint — site feels intentional instead of snapping. */
-  animation: pageIn 420ms cubic-bezier(.2,.7,.2,1) both;
-}
-@keyframes pageIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: none; }
-}
-
-::selection { background: var(--red); color: #fff; }
-
-main {
-  max-width: var(--measure);
-  margin: 0 auto;
-  padding: clamp(40px, 8vw, 96px) clamp(20px, 5vw, 32px) 64px;
-}
-
-/* ---------- header / intro ---------- */
-.intro {
-  display: grid;
-  grid-template-columns: 88px 1fr;
-  gap: 22px;
-  align-items: center;
-  margin-bottom: 28px;
-}
-@media (max-width: 460px) {
-  .intro { grid-template-columns: 1fr; gap: 16px; }
-}
-
-.portrait {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  position: relative;
-  background: var(--bg-soft);
-  overflow: hidden;
-  box-shadow: 0 0 0 1px var(--rule);
-}
-.portrait .monogram {
-  position: absolute; inset: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 44px;
-  color: var(--red);
-  letter-spacing: -0.02em;
-}
-.portrait img {
-  position: absolute; inset: 0;
+html, body {
   width: 100%; height: 100%;
-  object-fit: cover;
+  overflow: hidden;
+  font-family: "Courier New", monospace;
+  background: #000;
+  user-select: none;
+}
+
+/* =============================================================
+   BOOT SCREEN
+   ============================================================= */
+#boot {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2rem 3rem;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  transition: opacity 0.6s ease;
+}
+#boot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,.25) 2px, rgba(0,0,0,.25) 4px
+  );
+  z-index: 1;
+}
+#boot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.7) 100%);
+  z-index: 2;
+}
+#boot-inner {
+  position: relative;
+  z-index: 3;
+  max-width: 700px;
+}
+.boot-header {
+  color: #aaa;
+  margin-bottom: 1.4rem;
+  font-size: 12px;
+}
+.boot-line {
+  display: none;
+  white-space: pre;
+}
+.boot-line.visible { display: block; }
+.bc-green  { color: #00cc44; }
+.bc-yellow { color: #00cc44; }
+.bc-dim    { color: #00cc44; }
+.bc-white  { color: #00cc44; font-weight: bold; }
+#boot-progress-wrap {
+  display: none;
+  margin-top: 0.5rem;
+  color: #00cc44;
+}
+#boot-progress-bar {
+  display: inline-block;
+  background: #2a5a38;
+  height: 10px;
+  width: 0%;
+  vertical-align: middle;
+  transition: none;
+}
+#boot-progress-track {
+  display: inline-block;
+  width: 300px;
+  background: #1a331a;
+  height: 10px;
+  vertical-align: middle;
+  margin: 0 8px;
+}
+#boot-ready {
+  display: none;
+  color: #00ff66;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  font-size: 15px;
+}
+
+/* =============================================================
+   STARFIELD CANVAS
+   ============================================================= */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #050510;
+}
+
+/* =============================================================
+   DESKTOP
+   ============================================================= */
+#desktop {
+  position: fixed;
+  inset: 0 0 28px 0;
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+#desktop.visible { opacity: 1; }
+
+/* Desktop watermark label */
+#desktop-label {
+  position: absolute;
+  bottom: 48px;
+  right: 24px;
+  text-align: right;
+  pointer-events: none;
+  user-select: none;
+}
+#desktop-label .dl-name {
+  font-family: "Courier New", monospace;
+  font-size: 22px;
+  font-weight: bold;
+  color: rgba(255,255,255,0.10);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+#desktop-label .dl-sub {
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.06);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* =============================================================
+   WELCOME DIALOG
+   ============================================================= */
+#win-welcome {
+  position: fixed;
+  z-index: 9000;
+  width: 420px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #d4d0c8;
+  border: 2px solid #000;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080, 4px 4px 0 #000;
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 11px;
   display: none;
 }
-
-h1 {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(36px, 6.4vw, 52px);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-  margin: 0;
-}
-h1 .surname {
-  /* metallic red, with a slow drift across the gradient — like light
-     moving across brushed metal. 14s cycle — easy to miss, satisfying
-     once you notice it. */
-  background: linear-gradient(120deg,
-    #7a0e1c 0%,
-    #c4202c 28%,
-    #e8475c 50%,
-    #c4202c 72%,
-    #7a0e1c 100%);
-  background-size: 220% 100%;
-  background-position: 0% 50%;
-  -webkit-background-clip: text;
-          background-clip: text;
-  color: transparent;
-  animation: pearlDrift 14s ease-in-out infinite alternate;
-}
-@keyframes pearlDrift {
-  from { background-position:   0% 50%; }
-  to   { background-position: 100% 50%; }
-}
-
-.lede {
-  font-size: 19px;
-  color: var(--fg-soft);
-  margin: 18px 0 22px;
-  max-width: 34rem;
-}
-
-/* ---------- contact line ---------- */
-.contact-line {
-  font-family: var(--mono);
-  font-size: 14px;
-  color: var(--fg-muted);
-  margin: 0 0 8px;
+#win-welcome.open { display: block; animation: winOpen 120ms ease-out; }
+.welcome-titlebar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  padding: 3px 4px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  row-gap: 6px;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
 }
-.contact-line a {
-  color: var(--fg);
-  white-space: nowrap;          /* keep each link unbroken */
+.welcome-titlebar-title {
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+  flex: 1;
 }
-.contact-line .sep {
-  color: var(--rule-hi);
-  margin: 0 .55em;
+.welcome-body {
+  padding: 16px 16px 12px;
 }
-@media (max-width: 480px) {
-  /* dots dangle at line breaks on narrow screens — let flex gap do the spacing */
-  .contact-line .sep { display: none; }
-  .contact-line { column-gap: 14px; }
-}
-
-/* ---------- generic ---------- */
-a {
-  color: var(--red-hot);
-  text-decoration: underline;
-  text-decoration-color: var(--red-deep);
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  transition: color .15s ease, text-decoration-color .15s ease;
-}
-a:hover {
-  color: var(--red-hot);
-  text-decoration-color: var(--red-hot);
-}
-
-p { margin: 0 0 1.1em; color: var(--fg-soft); }
-strong { color: var(--fg); font-weight: 600; }
-em { color: var(--fg); }
-
-hr {
-  border: 0;
-  height: 1px;
-  background: var(--rule);
-  margin: 44px 0 32px;
-}
-
-/* a single subtly-metallic divider — used once or twice */
-hr.metal {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--red-deep) 20%,
-    var(--red) 50%,
-    var(--red-deep) 80%,
-    transparent 100%
-  );
-  opacity: .65;
-}
-
-h2 {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: -0.005em;
-  color: var(--fg);
-  margin: 0 0 16px;
-}
-
-ul, ol {
-  margin: 0 0 1.1em;
-  padding-left: 0;
-  list-style: none;
-}
-ul.entries > li {
-  margin-bottom: 22px;
-  color: var(--fg-soft);
-}
-ul.entries > li:last-child { margin-bottom: 0; }
-ul.entries .title {
-  color: var(--fg);
-  font-weight: 600;
-}
-ul.entries .meta {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--fg-muted);
-  letter-spacing: .02em;
-}
-/* On narrow screens, stack metadata under its title — avoids dangling
-   separators when "· Company · Date" wraps awkwardly. */
-@media (max-width: 560px) {
-  ul.entries .meta {
-    display: block;
-    margin-top: 2px;
-  }
-  ul.entries .meta--exp::before { content: ""; }   /* hide injected leading dot */
-}
-ul.entries .meta--exp::before {
-  content: "· ";
-  color: var(--rule-hi);
-}
-ul.entries p {
-  margin: 4px 0 0;
-}
-
-/* The one entry a visitor can actually click into and use. Marked with a
-   single metallic rule rather than a card — the rest of the page earns its
-   emphasis from typography, and a box here would fight that. */
-ul.entries > li.featured {
-  border-left: 2px solid var(--red-deep);
-  padding-left: 18px;
-  margin-left: -20px;
-}
-@media (max-width: 560px) {
-  ul.entries > li.featured { margin-left: 0; padding-left: 14px; }
-}
-
-ul.entries .links {
-  font-family: var(--mono);
-  font-size: 13px;
-  margin-top: 8px;
+.welcome-chat {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  row-gap: 4px;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
 }
-ul.entries .links a { white-space: nowrap; }
-ul.entries .links .sep { color: var(--rule-hi); margin: 0 .55em; }
-@media (max-width: 480px) {
-  ul.entries .links .sep { display: none; }
-  ul.entries .links { column-gap: 14px; }
+.welcome-avatar {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border: 2px solid #808080;
+  box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #fff;
+  overflow: hidden;
+  background: #888;
+  position: relative;
 }
-
-/* "now" status dot — gentle pulse, communicates "currently active" */
-.now-dot {
+.welcome-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.welcome-avatar-initials {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-weight: bold; font-size: 16px;
+  color: #d4d0c8;
+}
+.welcome-bubble {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #808080;
+  box-shadow: inset 1px 1px 0 #404040;
+  padding: 8px 10px;
+  position: relative;
+  min-height: 52px;
+}
+.welcome-bubble::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 16px;
+  width: 0; height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 7px solid #808080;
+}
+.welcome-bubble::after {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 17px;
+  width: 0; height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 6px solid #fff;
+}
+#welcome-text-wrap {
+  font-size: 11px;
+  color: #000;
+  line-height: 1.6;
+  min-height: 3.2em;
+}
+#welcome-text {
+  display: inline;
+}
+#welcome-cursor {
   display: inline-block;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--red);
-  margin-right: 6px;
-  vertical-align: 1px;
-  animation: nowPulse 2.4s ease-in-out infinite;
+  width: 6px; height: 11px;
+  background: #000;
+  vertical-align: text-bottom;
+  animation: blink .6s step-end infinite;
+  margin-left: 1px;
 }
-@keyframes nowPulse {
-  0%, 100% { box-shadow: 0 0 4px rgba(196, 32, 44, 0.45); }
-  50%      { box-shadow: 0 0 14px rgba(232, 71, 92, 0.85); }
+.welcome-hint {
+  background: #fffff0;
+  border: 1px solid #808080;
+  box-shadow: inset 1px 1px 0 #404040;
+  padding: 6px 10px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: #000;
+  line-height: 1.7;
+}
+.welcome-hint div { display: flex; align-items: baseline; gap: 6px; }
+.welcome-hint .hint-icon { color: #000080; font-size: 13px; }
+.welcome-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.welcome-btn {
+  font-family: inherit;
+  font-size: 11px;
+  background: #d4d0c8;
+  border: 2px solid #000;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+  padding: 3px 20px;
+  cursor: pointer;
+  min-width: 80px;
+}
+.welcome-btn:active {
+  box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #808080;
+}
+.welcome-btn.primary {
+  border-color: #000;
+  outline: 1px solid #000;
+  outline-offset: 2px;
 }
 
-/* footer */
-footer {
-  margin-top: 56px;
-  padding-top: 24px;
-  border-top: 1px solid var(--rule);
-  font-family: var(--mono);
-  font-size: 12.5px;
-  color: var(--fg-muted);
+/* Desktop icons */
+.desktop-icons {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-footer p { margin: 0; color: var(--fg-muted); }
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.desktop-icon:hover {
+  background: rgba(0,0,128,0.3);
+  border-color: rgba(100,100,255,0.5);
+}
+.desktop-icon.selected {
+  background: rgba(0,0,128,0.5);
+  border-color: #7777ff;
+}
+.icon-graphic {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  line-height: 1;
+  margin-bottom: 2px;
+  image-rendering: pixelated;
+}
+.icon-label {
+  color: #fff;
+  font-size: 11px;
+  text-align: center;
+  text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000;
+  word-break: break-all;
+  line-height: 1.2;
+}
 
-/* utility */
-.mono { font-family: var(--mono); font-size: .9em; }
-.muted { color: var(--fg-muted); }
-.nowrap { white-space: nowrap; }
+/* =============================================================
+   WIN98 WINDOW SYSTEM
+   ============================================================= */
+.win98-window {
+  position: absolute;
+  min-width: 300px;
+  min-height: 200px;
+  background: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #808080;
+  border-bottom: 2px solid #808080;
+  box-shadow: 2px 2px 0 #000, inset 1px 1px 0 #dfdfdf;
+  display: none;
+  flex-direction: column;
+  z-index: 10;
+  animation: winOpen 0.12s ease-out;
+}
+.win98-window.open { display: flex; }
+.win98-window.minimized { display: none !important; }
 
+@keyframes winOpen {
+  from { transform: scale(0.92); opacity: 0.5; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.win-titlebar {
+  height: 22px;
+  background: linear-gradient(to right, #000080, #1084d0);
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.win-titlebar.inactive {
+  background: linear-gradient(to right, #808080, #b0b0b0);
+}
+.win-title {
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 2px;
+}
+.win-icon-small {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.win-controls {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+.win-btn {
+  width: 16px;
+  height: 14px;
+  background: #d4d0c8;
+  border-top: 1px solid #fff;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  color: #000;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.win-btn:active {
+  border-top: 1px solid #808080;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+}
+.win-body {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+/* inner bevel */
+.win-body-inner {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  height: 100%;
+  overflow: auto;
+}
+
+/* resize handle */
+.win98-window .win-resize {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 12px; height: 12px;
+  cursor: se-resize !important;
+}
+
+/* =============================================================
+   WINDOW: ABOUT — clean Win98 profile dialog
+   ============================================================= */
+#win-about .win-body-inner {
+  background: #d4d0c8;
+  color: #000;
+  font-family: "MS Sans Serif", "Arial", sans-serif;
+  font-size: 11px;
+  overflow: auto;
+  height: 100%;
+}
+.about-inner {
+  padding: 12px 14px 14px;
+}
+.about-header {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.about-photo-frame {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border: 2px solid #808080;
+  box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #404040;
+  overflow: hidden;
+  background: #888;
+  position: relative;
+}
+.about-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.about-photo-initials {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #d4d0c8;
+}
+.about-name-block {
+  flex: 1;
+  padding-top: 2px;
+}
+.about-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 3px;
+}
+.about-role {
+  color: #444;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.about-rule {
+  height: 0;
+  border: none;
+  border-top: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
+  margin: 8px 0;
+}
+.about-section-head {
+  font-size: 11px;
+  font-weight: bold;
+  color: #000080;
+  margin: 8px 0 3px;
+}
+.about-body {
+  color: #222;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.about-body em {
+  font-style: normal;
+  font-weight: bold;
+  color: #000;
+}
+.about-status-box {
+  background: #fff;
+  border: 1px solid #808080;
+  box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #fff;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+.about-status-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 1px 0;
+  font-size: 11px;
+  color: #000;
+}
+.about-status-row::before {
+  content: '▪';
+  color: #000080;
+  flex-shrink: 0;
+}
+
+/* =============================================================
+   WINDOW: PROJECTS — Win98 Explorer
+   ============================================================= */
+#win-projects .win-body-inner {
+  background: #fff;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.explorer-toolbar {
+  background: #d4d0c8;
+  border-bottom: 1px solid #808080;
+  padding: 2px 4px;
+  font-size: 11px;
+  color: #000;
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.explorer-toolbar span {
+  padding: 1px 6px;
+  border: 1px solid transparent;
+}
+.explorer-toolbar span:hover {
+  border-top: 1px solid #fff;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+}
+.explorer-address {
+  background: #d4d0c8;
+  border-bottom: 2px solid #808080;
+  padding: 2px 6px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.explorer-address-label { color: #000; font-weight: bold; }
+.explorer-address-bar {
+  flex: 1;
+  background: #fff;
+  border-top: 1px solid #808080;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  padding: 1px 4px;
+  font-size: 11px;
+  font-family: "Courier New", monospace;
+  color: #000;
+}
+.explorer-list {
+  flex: 1;
+  overflow: auto;
+}
+.explorer-header {
+  display: grid;
+  grid-template-columns: 1fr 70px 90px;
+  background: #d4d0c8;
+  border-bottom: 1px solid #808080;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000;
+  position: sticky;
+  top: 0;
+}
+.explorer-header div {
+  padding: 2px 6px;
+  border-right: 1px solid #808080;
+  border-top: 1px solid #fff;
+  border-left: 1px solid #fff;
+}
+.explorer-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 90px;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 11px;
+  color: #000;
+  align-items: start;
+  padding: 2px 0;
+}
+.explorer-row:hover { background: #d6e8ff; }
+.explorer-row.selected { background: #000080; color: #fff; }
+.explorer-row.selected a { color: #88ccff; }
+.explorer-cell {
+  padding: 2px 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
+.explorer-cell-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.explorer-cell-content { flex: 1; line-height: 1.4; }
+.explorer-cell-content strong { font-size: 12px; display: block; margin-bottom: 2px; }
+.explorer-cell-content p { font-size: 10px; color: #444; margin: 2px 0; }
+.explorer-row.selected .explorer-cell-content p { color: #ccc; }
+.explorer-links { margin-top: 2px; font-size: 10px; }
+.explorer-links a { color: #0000cc; text-decoration: underline; margin-right: 8px; }
+.explorer-row.selected .explorer-links a { color: #88ccff; }
+.explorer-size, .explorer-date {
+  padding: 2px 6px;
+  font-size: 11px;
+  color: #555;
+  white-space: nowrap;
+}
+.explorer-row.selected .explorer-size,
+.explorer-row.selected .explorer-date { color: #ccc; }
+
+/* =============================================================
+   WINDOW: SKILLS — Terminal
+   ============================================================= */
+#win-skills .win-body-inner {
+  background: #000;
+  height: 100%;
+  overflow: auto;
+}
+.terminal-inner {
+  padding: 10px 14px;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #00cc44;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.terminal-inner .t-comment { color: #556655; }
+.terminal-inner .t-key    { color: #00cc44; }
+.terminal-inner .t-val    { color: #88ff88; }
+.terminal-inner .t-prompt { color: #00ff66; font-weight: bold; }
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: #00ff66;
+  animation: cursorBlink 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* =============================================================
+   WINDOW: CONTACT — Notepad
+   ============================================================= */
+#win-contact .win-body-inner {
+  background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.notepad-menubar {
+  background: #d4d0c8;
+  display: flex;
+  border-bottom: 1px solid #808080;
+  flex-shrink: 0;
+}
+.notepad-menu-item {
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #000;
+  font-family: "Courier New", monospace;
+}
+.notepad-menu-item:hover {
+  background: #000080;
+  color: #fff;
+}
+.notepad-menu-item span { text-decoration: underline; }
+.notepad-body {
+  flex: 1;
+  padding: 8px 10px;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #000;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+.notepad-body a {
+  color: #0000cc;
+  text-decoration: underline;
+}
+.notepad-comment { color: #808080; }
+
+/* =============================================================
+   WINDOW: HACKMAN — game window
+   ============================================================= */
+#win-hackman .win-body-inner {
+  background: #000;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+#hackman-title-screen {
+  text-align: center;
+  font-family: "Courier New", monospace;
+  color: #00ff44;
+}
+.hackman-access {
+  font-size: 14px;
+  color: #00cc44;
+  margin-bottom: 16px;
+  animation: accessBlink 0.8s step-end infinite;
+}
+@keyframes accessBlink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+.hackman-logo {
+  font-size: 36px;
+  font-weight: bold;
+  letter-spacing: 6px;
+  color: #00ff44;
+  text-shadow: 0 0 10px #00ff44, 0 0 20px #00ff44;
+  margin-bottom: 8px;
+}
+.hackman-sub {
+  font-size: 11px;
+  color: #00aa33;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+.hackman-press {
+  font-size: 12px;
+  color: #88ff88;
+  animation: accessBlink 1.2s step-end infinite;
+}
+#hackman-canvas-wrap { display: none; flex-direction: column; align-items: center; }
+#hackman-hud {
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  color: #00ff44;
+  padding: 4px 8px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background: #001100;
+}
+#hackman-canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+#hackman-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: "Courier New", monospace;
+  text-align: center;
+  z-index: 5;
+}
+#hackman-overlay.show { display: flex; }
+#hackman-overlay-msg {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+#hackman-overlay-sub {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 16px;
+}
+#hackman-overlay-btn {
+  background: #004400;
+  color: #00ff44;
+  border: 2px solid #00ff44;
+  padding: 5px 16px;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* =============================================================
+   TASKBAR
+   ============================================================= */
+#taskbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 28px;
+  background: #d4d0c8;
+  border-top: 2px solid #fff;
+  box-shadow: 0 -1px 0 #808080;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  z-index: 8000;
+}
+.start-btn {
+  height: 22px;
+  padding: 0 8px;
+  background: #d4d0c8;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #808080;
+  border-bottom: 2px solid #808080;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.start-btn:active {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+.start-logo {
+  font-size: 14px;
+  display: flex;
+  gap: 1px;
+  line-height: 1;
+}
+.start-logo span:nth-child(1) { color: #ff0000; }
+.start-logo span:nth-child(2) { color: #00cc00; }
+.start-logo span:nth-child(3) { color: #0000ff; }
+.start-logo span:nth-child(4) { color: #ffcc00; }
+
+.taskbar-sep {
+  width: 2px;
+  height: 22px;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+  flex-shrink: 0;
+}
+.taskbar-tabs {
+  flex: 1;
+  display: flex;
+  gap: 3px;
+  overflow: hidden;
+}
+.taskbar-tab {
+  height: 22px;
+  padding: 0 8px;
+  background: #d4d0c8;
+  border-top: 1px solid #fff;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+  font-size: 11px;
+  font-family: "Courier New", monospace;
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 140px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+.taskbar-tab.active {
+  border-top: 1px solid #808080;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  background: #bbb8b0;
+}
+
+.system-tray {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-top: 1px solid #808080;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  padding: 2px 8px;
+  height: 22px;
+  flex-shrink: 0;
+}
+#tray-date {
+  font-size: 11px;
+  font-family: "Courier New", monospace;
+  color: #000;
+  white-space: nowrap;
+  border-right: 1px solid #808080;
+  padding-right: 6px;
+  margin-right: 2px;
+}
+#tray-clock {
+  font-size: 11px;
+  font-family: "Courier New", monospace;
+  color: #000;
+  min-width: 42px;
+  text-align: right;
+}
+
+/* =============================================================
+   WIN98 SCROLLBARS — chunky, always visible
+   ============================================================= */
+::-webkit-scrollbar {
+  width: 17px;
+  height: 17px;
+}
+::-webkit-scrollbar-track {
+  background: #444;
+  border-left: 1px solid #222;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d0c8;
+  border-top:    2px solid #ffffff;
+  border-left:   2px solid #ffffff;
+  border-right:  2px solid #404040;
+  border-bottom: 2px solid #404040;
+  min-height: 24px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #eae6de;
+}
+::-webkit-scrollbar-thumb:active {
+  background: #bdb8b0;
+  border-top:    2px solid #404040;
+  border-left:   2px solid #404040;
+  border-right:  2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+}
+::-webkit-scrollbar-button {
+  background: #d4d0c8;
+  border-top:    2px solid #ffffff;
+  border-left:   2px solid #ffffff;
+  border-right:  2px solid #404040;
+  border-bottom: 2px solid #404040;
+  width: 17px;
+  height: 17px;
+  display: block;
+  flex-shrink: 0;
+}
+::-webkit-scrollbar-button:active {
+  border-top:    2px solid #404040;
+  border-left:   2px solid #404040;
+  border-right:  2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+}
+/* Up arrow */
+::-webkit-scrollbar-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpolygon points='8,4 13,12 3,12' fill='%23000'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/* Down arrow */
+::-webkit-scrollbar-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpolygon points='8,13 13,5 3,5' fill='%23000'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/* Left arrow */
+::-webkit-scrollbar-button:horizontal:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpolygon points='4,8 12,3 12,13' fill='%23000'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/* Right arrow */
+::-webkit-scrollbar-button:horizontal:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpolygon points='13,8 5,3 5,13' fill='%23000'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+::-webkit-scrollbar-corner {
+  background: #d4d0c8;
+}
+
+/* Firefox / modern Chrome fallback */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #d4d0c8 #444;
+}
+
+/* =============================================================
+   REDUCED MOTION
+   ============================================================= */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+  .about-marquee, .badge, .terminal-cursor, .hackman-access, .hackman-press { animation: none; }
+  .win98-window { animation: none; }
+  #boot { transition: none; }
+  #desktop { transition: none; }
+}
+
+/* =============================================================
+   MOBILE FALLBACK
+   ============================================================= */
+#mobile-fallback {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #050510;
+  color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  z-index: 99999;
+  overflow-y: auto;
+  padding: 48px 32px 64px;
+  box-sizing: border-box;
+}
+#mobile-fallback.show { display: block; }
+.mob-name {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.mob-role {
+  font-size: 16px;
+  color: #8b9abb;
+  margin-bottom: 28px;
+  font-weight: 400;
+}
+.mob-bio {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #c8cfe0;
+  max-width: 480px;
+  margin-bottom: 36px;
+}
+.mob-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+.mob-links a {
+  color: #7ba7d4;
+  text-decoration: none;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(123,167,212,0.3);
+  padding-bottom: 14px;
+}
+.mob-links a:last-child { border-bottom: none; padding-bottom: 0; }
+.mob-links a:hover { color: #aac8e8; }
+.mob-note {
+  font-size: 12px;
+  color: #4a5068;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-top: 1px solid #1e2240;
+  padding-top: 20px;
+}
+
+/* =============================================================
+   CONTEXT MENU
+   ============================================================= */
+#ctx-menu {
+  display: none;
+  position: fixed;
+  z-index: 99000;
+  background: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+  min-width: 180px;
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 11px;
+  padding: 2px;
+}
+#ctx-menu.show { display: block; }
+.ctx-item {
+  padding: 4px 20px 4px 24px;
+  color: #000;
+  white-space: nowrap;
+  position: relative;
+}
+.ctx-item:hover {
+  background: #000080;
+  color: #fff;
+}
+.ctx-sep {
+  height: 0;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+  margin: 2px 2px;
+}
+
+/* =============================================================
+   START MENU
+   ============================================================= */
+#start-menu {
+  display: none;
+  position: fixed;
+  bottom: 28px;
+  left: 0;
+  z-index: 98000;
+  background: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 11px;
+  flex-direction: row;
+  min-width: 200px;
+}
+#start-menu.show { display: flex; }
+.start-menu-sidebar {
+  width: 24px;
+  background: linear-gradient(to top, #000080, #1084d0);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+.start-menu-sidebar span {
+  color: rgba(255,255,255,0.7);
+  font-size: 11px;
+  font-weight: bold;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  font-family: "MS Sans Serif", Arial, sans-serif;
+}
+.start-menu-items {
+  flex: 1;
+  padding: 2px;
+}
+.sm-item {
+  padding: 5px 20px 5px 8px;
+  color: #000;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.sm-item:hover {
+  background: #000080;
+  color: #fff;
+}
+.sm-item .sm-arrow {
+  margin-left: auto;
+  font-size: 9px;
+}
+.sm-sep {
+  height: 0;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+  margin: 2px 2px;
+}
+/* Programs submenu */
+#sm-programs-sub {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+  min-width: 160px;
+  z-index: 99001;
+  padding: 2px;
+}
+#sm-programs-wrap:hover #sm-programs-sub { display: block; }
+#sm-programs-wrap { position: relative; }
+
+/* =============================================================
+   SHUTDOWN DIALOG
+   ============================================================= */
+#shutdown-dlg {
+  display: none;
+  position: fixed;
+  z-index: 99500;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  background: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #808080;
+  border-bottom: 2px solid #808080;
+  box-shadow: 2px 2px 0 #000, inset 1px 1px 0 #dfdfdf;
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 11px;
+}
+#shutdown-dlg.show { display: block; }
+.shutdown-titlebar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  padding: 3px 4px;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+.shutdown-body {
+  padding: 16px;
+  text-align: center;
+}
+.shutdown-body p { margin-bottom: 14px; font-size: 12px; color: #000; line-height: 1.5; }
+.shutdown-footer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px 14px;
+}
+.shutdown-btn {
+  font-family: inherit;
+  font-size: 11px;
+  background: #d4d0c8;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #808080;
+  border-bottom: 2px solid #808080;
+  padding: 3px 16px;
+  min-width: 72px;
+}
+.shutdown-btn:active {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+
+/* =============================================================
+   PRINT RESUME
+   ============================================================= */
+#resume-print { display: none; }
+
+@media print {
+  html, body { display: block !important; margin: 0; padding: 0; }
+  body > *:not(#resume-print) { display: none !important; }
+  #resume-print {
+    display: block !important;
+    position: static !important;
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 11pt;
+    color: #000;
+    background: #fff;
+    margin: 0;
+    padding: 0.5in 0.75in;
+    line-height: 1.4;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  #resume-print h1 {
+    font-size: 18pt;
+    font-weight: bold;
+    margin-bottom: 2pt;
+    border-bottom: 1pt solid #000;
+    padding-bottom: 4pt;
+  }
+  #resume-print .r-contact {
+    font-size: 9pt;
+    margin-bottom: 12pt;
+    color: #333;
+  }
+  #resume-print h2 {
+    font-size: 11pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1pt;
+    border-bottom: 0.5pt solid #000;
+    margin: 12pt 0 4pt;
+    padding-bottom: 2pt;
+  }
+  #resume-print h3 {
+    font-size: 11pt;
+    font-weight: bold;
+    margin: 8pt 0 2pt;
+  }
+  #resume-print .r-meta {
+    font-size: 10pt;
+    color: #555;
+    margin-bottom: 4pt;
+  }
+  #resume-print p {
+    margin-bottom: 4pt;
+    font-size: 10.5pt;
+  }
+  #resume-print ul {
+    margin: 0 0 6pt 16pt;
+    padding: 0;
+  }
+  #resume-print ul li {
+    font-size: 10.5pt;
+    margin-bottom: 2pt;
+  }
+  #resume-print .r-skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2pt 16pt;
+    font-size: 10pt;
   }
 }
 </style>
 </head>
-
 <body>
 
-<main>
+<!-- STARFIELD -->
+<canvas id="starfield"></canvas>
 
-  <!-- ============================ INTRO -->
-  <header class="intro">
-    <div class="portrait" aria-hidden="true">
-      <div class="monogram">db</div>
-      <img src="photo.jpg" alt="Derek Bartlett"
-           onload="this.style.display='block'; this.previousElementSibling.style.display='none';" />
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div id="boot-inner">
+    <div class="boot-header">BARTLETT/DEREK BIOS v2.6.1&nbsp;&nbsp;(C) 2026</div>
+    <div class="boot-line bc-green"  id="bl0">Memory check....................&nbsp; 8192 MB&nbsp; OK</div>
+    <div class="boot-line bc-green"  id="bl1">CPU: platform-eng @ 4.2 GHz&nbsp;&nbsp;&nbsp;[ OK ]</div>
+    <div class="boot-line bc-green"  id="bl2">Storage: /dev/portfolio&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ OK ]</div>
+    <div class="boot-line bc-yellow" id="bl3">Network: derekbartlett.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ CONNECTING... ]</div>
+    <div class="boot-line bc-dim"    id="bl4">&#x2500;&#x2500; PIPELINE: deploy/portfolio &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;</div>
+    <div class="boot-line bc-green"  id="bl5">&nbsp;&nbsp;[STAGE 1/5]&nbsp; environment........&nbsp; CONFIGURED</div>
+    <div class="boot-line bc-green"  id="bl6">&nbsp;&nbsp;[STAGE 2/5]&nbsp; config inject......&nbsp; OK</div>
+    <div class="boot-line bc-green"  id="bl7">&nbsp;&nbsp;[STAGE 3/5]&nbsp; smoke tests........&nbsp; PASSED (7/7)</div>
+    <div class="boot-line bc-green"  id="bl8">&nbsp;&nbsp;[STAGE 4/5]&nbsp; quality gate.......&nbsp; APPROVED</div>
+    <div class="boot-line bc-green"  id="bl9">&nbsp;&nbsp;[STAGE 5/5]&nbsp; promote to prod....&nbsp; GO</div>
+    <div class="boot-line bc-white"  id="bl10">DEPLOYING&nbsp; derek-bartlett@latest</div>
+    <div id="boot-progress-wrap">
+      <span>Loading&nbsp;[</span><span id="boot-progress-track"><span id="boot-progress-bar"></span></span><span>]&nbsp;</span><span id="boot-pct">0%</span>
     </div>
-    <h1>Derek <span class="surname">Bartlett</span></h1>
-  </header>
+    <div id="boot-ready">READY.</div>
+  </div>
+</div>
 
-  <p class="lede">
-    Platform and DevOps engineer building multi-environment delivery systems, progressive delivery pipelines, and the tooling that lets developers self-serve.
-  </p>
+<!-- DESKTOP -->
+<div id="desktop">
 
-  <p class="contact-line">
+  <!-- Desktop watermark -->
+  <div id="desktop-label">
+    <div class="dl-name">Derek Bartlett</div>
+    <div class="dl-sub">Portfolio &nbsp;·&nbsp; derekbartlett.com</div>
+  </div>
+
+  <!-- Welcome dialog -->
+  <div id="win-welcome">
+    <div class="welcome-titlebar">
+      <span class="welcome-titlebar-title">&#x1F44B; Welcome — derek@bartlett.com</span>
+    </div>
+    <div class="welcome-body">
+      <div class="welcome-chat">
+        <div class="welcome-avatar">
+          <div class="welcome-avatar-initials" id="welcome-initials">db</div>
+          <img src="photo.jpg" alt="Derek"
+               onload="this.style.display='block';document.getElementById('welcome-initials').style.display='none';"
+               onerror="this.style.display='none';" />
+        </div>
+        <div class="welcome-bubble">
+          <div id="welcome-text-wrap"><span id="welcome-text"></span><span id="welcome-cursor" style="display:none"></span></div>
+        </div>
+      </div>
+      <div class="welcome-hint" id="welcome-hint" style="display:none;">
+        <div><span class="hint-icon">&#x1F4C1;</span> <span><strong>projects/</strong> — things I've built</span></div>
+        <div><span class="hint-icon">&#x1F4C4;</span> <span><strong>skills.json</strong> — what I work with</span></div>
+        <div><span class="hint-icon">&#x2709;&#xFE0F;</span> <span><strong>contact.txt</strong> — get in touch</span></div>
+      </div>
+      <div class="welcome-footer">
+        <button class="welcome-btn primary" id="welcome-ok" onclick="dismissWelcome()" style="display:none;">Let's go &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop Icons -->
+  <div class="desktop-icons">
+    <div class="desktop-icon" id="icon-about" ondblclick="iconOpen('about')" onclick="selectIcon(this)">
+      <div class="icon-graphic">&#x1F464;</div>
+      <div class="icon-label">about.exe</div>
+    </div>
+    <div class="desktop-icon" id="icon-projects" ondblclick="iconOpen('projects')" onclick="selectIcon(this)">
+      <div class="icon-graphic">&#x1F4C1;</div>
+      <div class="icon-label">projects/</div>
+    </div>
+    <div class="desktop-icon" id="icon-skills" ondblclick="iconOpen('skills')" onclick="selectIcon(this)">
+      <div class="icon-graphic">&#x1F4C4;</div>
+      <div class="icon-label">skills.json</div>
+    </div>
+    <div class="desktop-icon" id="icon-contact" ondblclick="iconOpen('contact')" onclick="selectIcon(this)">
+      <div class="icon-graphic">&#x2709;&#xFE0F;</div>
+      <div class="icon-label">contact.txt</div>
+    </div>
+    <div class="desktop-icon" id="icon-hackman" ondblclick="openWindow('hackman')" onclick="selectIcon(this)">
+      <div class="icon-graphic" style="font-size:24px; color:#ff0; text-shadow:0 0 6px #f80;">&#x2753;</div>
+      <div class="icon-label">???</div>
+    </div>
+  </div>
+
+  <!-- WINDOW: ABOUT -->
+  <div class="win98-window" id="win-about" style="width:480px;height:440px;top:60px;left:120px;">
+    <div class="win-titlebar" id="tb-about">
+      <span class="win-icon-small">&#x1F464;</span>
+      <span class="win-title">about.exe</span>
+      <div class="win-controls">
+        <div class="win-btn win-minimize" onclick="minimizeWindow('about')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-close" onclick="closeWindow('about')" title="Close">&#x2715;</div>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="win-body-inner">
+        <div class="about-inner">
+          <div class="about-header">
+            <div class="about-photo-frame">
+              <div class="about-photo-initials" id="about-initials">db</div>
+              <img src="photo.jpg" alt="Derek Bartlett"
+                   onload="this.style.display='block';document.getElementById('about-initials').style.display='none';"
+                   onerror="this.style.display='none';" />
+            </div>
+            <div class="about-name-block">
+              <div class="about-name">Derek Bartlett</div>
+              <div class="about-role">
+                Platform &amp; DevOps Engineer<br>
+                Grand Rapids, MI &nbsp;·&nbsp; remote<br>
+                <em>Open to new roles</em>
+              </div>
+            </div>
+          </div>
+
+          <hr class="about-rule" />
+
+          <div class="about-section-head">About</div>
+          <div class="about-body">
+            Platform and DevOps engineer building <em>multi-environment delivery systems</em>, progressive delivery pipelines, and the tooling that lets developers self-serve. The right fit is somewhere I can build the paved path rather than just walk it.
+          </div>
+
+          <div class="about-section-head">Now</div>
+          <div class="about-status-box">
+            <div class="about-status-row">DevOps Engineer @ Revenue Solutions, Inc. — remote</div>
+            <div class="about-status-row">~70 environments across 7 client implementations</div>
+            <div class="about-status-row">HashiCorp Terraform Associate in progress (2026)</div>
+            <div class="about-status-row">Building Golden Path — statistical canary analysis pipeline</div>
+          </div>
+
+          <div class="about-section-head">Off the clock</div>
+          <div class="about-body">
+            Musician who loves to tinker with tech — <em>3D printing, food, jazz.</em> Big gamer; used to be semi-pro in a few PC titles.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="win-resize"></div>
+  </div>
+
+  <!-- WINDOW: PROJECTS -->
+  <div class="win98-window" id="win-projects" style="width:560px;height:420px;top:80px;left:160px;">
+    <div class="win-titlebar" id="tb-projects">
+      <span class="win-icon-small">&#x1F4C1;</span>
+      <span class="win-title">projects/ — Windows Explorer</span>
+      <div class="win-controls">
+        <div class="win-btn win-minimize" onclick="minimizeWindow('projects')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-close" onclick="closeWindow('projects')" title="Close">&#x2715;</div>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="win-body-inner" style="display:flex;flex-direction:column;">
+        <div class="explorer-toolbar">
+          <span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Favorites</span><span>Help</span>
+        </div>
+        <div class="explorer-address">
+          <span class="explorer-address-label">Address</span>
+          <div class="explorer-address-bar">C:\Users\Derek\projects\</div>
+        </div>
+        <div class="explorer-list">
+          <div class="explorer-header">
+            <div>Name</div>
+            <div>Size</div>
+            <div>Modified</div>
+          </div>
+          <!-- Row 1 -->
+          <div class="explorer-row" onclick="selectRow(this)">
+            <div class="explorer-cell">
+              <span class="explorer-cell-icon">&#x2699;&#xFE0F;</span>
+              <div class="explorer-cell-content">
+                <strong>GoldenPath.exe</strong>
+                <p>A deployment pipeline that decides statistically whether a build is allowed to reach production. Canary analysis, Mann-Whitney U, red/black traffic switch.</p>
+                <div class="explorer-links">
+                  <a href="https://derekbartlett.com/golden-path-pipeline/" target="_blank" rel="noopener">interactive demo</a>
+                  <a href="https://github.com/DBITK/golden-path-pipeline" target="_blank" rel="noopener">source</a>
+                  <a href="https://github.com/DBITK/golden-path-pipeline/actions" target="_blank" rel="noopener">run the pipeline</a>
+                </div>
+              </div>
+            </div>
+            <div class="explorer-size">4.2 MB</div>
+            <div class="explorer-date">2025-11-12</div>
+          </div>
+          <!-- Row 2 -->
+          <div class="explorer-row" onclick="selectRow(this)">
+            <div class="explorer-cell">
+              <span class="explorer-cell-icon">&#x1F4C1;</span>
+              <div class="explorer-cell-content">
+                <strong>homelab/</strong>
+                <p>Single-server Proxmox host, RAID 1, TrueNAS, Jellyfin, Sonarr stack, Home Assistant, Pi-hole. Treated my own kit like prod.</p>
+              </div>
+            </div>
+            <div class="explorer-size">—</div>
+            <div class="explorer-date">2024-08-03</div>
+          </div>
+          <!-- Row 3 -->
+          <div class="explorer-row" onclick="selectRow(this)">
+            <div class="explorer-cell">
+              <span class="explorer-cell-icon">&#x1F4CB;</span>
+              <div class="explorer-cell-content">
+                <strong>LoRaWAN_CMU.log</strong>
+                <p>Designed and deployed end-to-end LoRaWAN infrastructure at CMU's DISCR Lab alongside peer institutions. MQTT, Grafana, containerized services.</p>
+              </div>
+            </div>
+            <div class="explorer-size">1.1 MB</div>
+            <div class="explorer-date">2023-05-20</div>
+          </div>
+          <!-- Row 4 -->
+          <div class="explorer-row" onclick="selectRow(this)">
+            <div class="explorer-cell">
+              <span class="explorer-cell-icon">&#x1F4C1;</span>
+              <div class="explorer-cell-content">
+                <strong>RSI_delivery_platform/</strong>
+                <p>Azure DevOps release pipelines running daily .NET, Java, SQL, SSRS, SSIS deployments across 70+ environments for 12 government client implementations.</p>
+              </div>
+            </div>
+            <div class="explorer-size">—</div>
+            <div class="explorer-date">2026-07-01</div>
+          </div>
+          <!-- Row 5 -->
+          <div class="explorer-row" onclick="selectRow(this)">
+            <div class="explorer-cell">
+              <span class="explorer-cell-icon">&#x1F4DC;</span>
+              <div class="explorer-cell-content">
+                <strong>selfservice_tools.ps1</strong>
+                <p>PowerShell GUI utilities replacing manual multi-server deployment workflows. Paving-the-path work, before I had the vocabulary for it.</p>
+              </div>
+            </div>
+            <div class="explorer-size">84 KB</div>
+            <div class="explorer-date">2024-02-14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="win-resize"></div>
+  </div>
+
+  <!-- WINDOW: SKILLS -->
+  <div class="win98-window" id="win-skills" style="width:500px;height:460px;top:70px;left:140px;">
+    <div class="win-titlebar" id="tb-skills">
+      <span class="win-icon-small">&#x1F4C4;</span>
+      <span class="win-title">skills.json — [Read Only]</span>
+      <div class="win-controls">
+        <div class="win-btn win-minimize" onclick="minimizeWindow('skills')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-close" onclick="closeWindow('skills')" title="Close">&#x2715;</div>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="win-body-inner">
+        <div class="terminal-inner"><span class="t-prompt">$ cat skills.json</span>
+
+<span class="t-comment"># delivery &amp; release engineering</span>
+<span class="t-key">"ci_cd"</span>: [<span class="t-val">"Azure DevOps"</span>, <span class="t-val">"GitHub Actions"</span>, <span class="t-val">"JAMS"</span>],
+<span class="t-key">"release"</span>: [<span class="t-val">"Pipelines"</span>, <span class="t-val">"Boards"</span>, <span class="t-val">"SDLC process design"</span>],
+
+<span class="t-comment"># progressive delivery</span>
+<span class="t-key">"delivery"</span>: [<span class="t-val">"canary analysis"</span>, <span class="t-val">"red/black deployments"</span>, <span class="t-val">"Argo Rollouts"</span>],
+<span class="t-key">"statistics"</span>: [<span class="t-val">"Mann-Whitney U"</span>, <span class="t-val">"effect-size gating"</span>],
+
+<span class="t-comment"># cloud &amp; IaC</span>
+<span class="t-key">"cloud"</span>: [<span class="t-val">"Azure"</span>, <span class="t-val">"AWS"</span>],
+<span class="t-key">"iac"</span>: [<span class="t-val">"Terraform"</span> <span class="t-comment">/* Associate in progress */</span>],
+
+<span class="t-comment"># infrastructure</span>
+<span class="t-key">"os"</span>: [<span class="t-val">"Windows Server 2016-2022"</span>, <span class="t-val">"Debian"</span>, <span class="t-val">"Ubuntu"</span>, <span class="t-val">"Alpine"</span>],
+<span class="t-key">"virt"</span>: [<span class="t-val">"VMware ESXi/vSphere"</span>, <span class="t-val">"Hyper-V"</span>, <span class="t-val">"Proxmox"</span>],
+<span class="t-key">"services"</span>: [<span class="t-val">"AD"</span>, <span class="t-val">"DNS"</span>, <span class="t-val">"DHCP"</span>, <span class="t-val">"IIS"</span>],
+
+<span class="t-comment"># scripting &amp; languages</span>
+<span class="t-key">"primary"</span>: [<span class="t-val">"PowerShell"</span>, <span class="t-val">"Python"</span>, <span class="t-val">"SQL"</span>],
+<span class="t-key">"exposure"</span>: [<span class="t-val">"JavaScript"</span>, <span class="t-val">"React"</span>, <span class="t-val">"HTML/CSS"</span>],
+
+<span class="t-comment"># observability &amp; data</span>
+<span class="t-key">"monitoring"</span>: [<span class="t-val">"Grafana"</span>, <span class="t-val">"Kibana"</span>],
+<span class="t-key">"data"</span>: [<span class="t-val">"SQL Server"</span>, <span class="t-val">"SSRS"</span>, <span class="t-val">"SSIS"</span>],
+
+<span class="t-comment"># platforms</span>
+<span class="t-key">"tools"</span>: [<span class="t-val">"Git"</span>, <span class="t-val">"ServiceNow"</span>, <span class="t-val">"OpenText Content Server"</span>]
+
+<span class="t-prompt">$ </span><span class="terminal-cursor"></span></div>
+      </div>
+    </div>
+    <div class="win-resize"></div>
+  </div>
+
+  <!-- WINDOW: CONTACT -->
+  <div class="win98-window" id="win-contact" style="width:380px;height:300px;top:90px;left:150px;">
+    <div class="win-titlebar" id="tb-contact">
+      <span class="win-icon-small">&#x2709;</span>
+      <span class="win-title">contact.txt — Notepad</span>
+      <div class="win-controls">
+        <div class="win-btn win-minimize" onclick="minimizeWindow('contact')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-close" onclick="closeWindow('contact')" title="Close">&#x2715;</div>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="win-body-inner">
+        <div class="notepad-menubar">
+          <div class="notepad-menu-item"><span>F</span>ile</div>
+          <div class="notepad-menu-item"><span>E</span>dit</div>
+          <div class="notepad-menu-item">F<span>o</span>rmat</div>
+          <div class="notepad-menu-item"><span>H</span>elp</div>
+        </div>
+        <div class="notepad-body"><a href="mailto:derek@derekbartlett.com">derek@derekbartlett.com</a>
+<a href="https://github.com/DBITK" target="_blank" rel="noopener">github.com/DBITK</a>
+<a href="https://linkedin.com/in/DBIT" target="_blank" rel="noopener">linkedin.com/in/DBIT</a>
+
+<span class="notepad-comment">// best way to reach me: email above
+// also on linkedin
+// check out my github!</span>
+
+&#x00A9; <span id="contact-year">2026</span> Derek Bartlett &middot; Grand Rapids, MI
+hand-rolled HTML, no trackers</div>
+      </div>
+    </div>
+    <div class="win-resize"></div>
+  </div>
+
+  <!-- WINDOW: HACKMAN -->
+  <div class="win98-window" id="win-hackman" style="width:420px;height:380px;top:50px;left:130px;">
+    <div class="win-titlebar" id="tb-hackman">
+      <span class="win-icon-small">&#x2753;</span>
+      <span class="win-title">??? — UNKNOWN PROGRAM</span>
+      <div class="win-controls">
+        <div class="win-btn win-minimize" onclick="minimizeWindow('hackman')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-close" onclick="closeWindow('hackman')" title="Close">&#x2715;</div>
+      </div>
+    </div>
+    <div class="win-body" style="position:relative;">
+      <div class="win-body-inner" style="position:relative;">
+        <!-- Title screen -->
+        <div id="hackman-title-screen">
+          <div class="hackman-access">ACCESSING MAINFRAME...</div>
+          <div class="hackman-logo">HACKMAN</div>
+          <div class="hackman-sub">eat the bytes before the antivirus finds you</div>
+          <div class="hackman-press">[ PRESS ENTER OR CLICK TO START ]</div>
+        </div>
+        <!-- Game -->
+        <div id="hackman-canvas-wrap">
+          <div id="hackman-hud">
+            <span>SCORE: <span id="hm-score">0</span></span>
+            <span>LIVES: <span id="hm-lives">3</span></span>
+            <span>LEVEL: <span id="hm-level">1</span></span>
+          </div>
+          <canvas id="hackman-canvas" width="380" height="300"></canvas>
+          <div id="hackman-overlay">
+            <div id="hackman-overlay-msg"></div>
+            <div id="hackman-overlay-sub"></div>
+            <button id="hackman-overlay-btn" onclick="hackmanRestart()">REBOOT SYSTEM</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="win-resize"></div>
+  </div>
+</div>
+
+<!-- MOBILE FALLBACK -->
+<div id="mobile-fallback">
+  <div class="mob-name">Derek Bartlett</div>
+  <div class="mob-role">Platform &amp; DevOps Engineer</div>
+  <div class="mob-bio">Platform and DevOps engineer building multi-environment delivery systems, progressive delivery pipelines, and the tooling that lets developers self-serve.</div>
+  <div class="mob-links">
     <a href="mailto:derek@derekbartlett.com">derek@derekbartlett.com</a>
-    <span class="sep">·</span>
-    <a href="https://github.com/DBITK" target="_blank" rel="noopener">github</a>
-    <span class="sep">·</span>
-    <a href="https://www.linkedin.com/in/DBIT" target="_blank" rel="noopener">linkedin</a>
-  </p>
+    <a href="https://github.com/DBITK" target="_blank" rel="noopener">github.com/DBITK</a>
+    <a href="https://linkedin.com/in/DBIT" target="_blank" rel="noopener">linkedin.com/in/DBIT</a>
+  </div>
+  <div class="mob-note">Full experience available on desktop</div>
+</div>
 
-  <hr class="metal" />
+<!-- CONTEXT MENU -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="ctxAction('about')">Open about.exe</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxAction('projects')">Projects/</div>
+  <div class="ctx-item" onclick="ctxAction('skills')">skills.json</div>
+  <div class="ctx-item" onclick="ctxAction('contact')">contact.txt</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="hideCtxMenu();window.print()">Print Resume...</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="hideCtxMenu();window.open('https://github.com/DBITK','_blank')">View Source</div>
+</div>
 
-  <!-- ============================ NOW -->
-  <section>
-    <h2><span class="now-dot" aria-hidden="true"></span>Now</h2>
-    <p>
-      DevOps Engineer at <strong>Revenue Solutions, Inc.</strong>, working
-      remotely from Grand Rapids. Active across seven client implementations
-      and roughly seventy environments at any given time.
-    </p>
-    <p>
-      Studying for the <strong>HashiCorp Terraform Associate</strong> (target 2026)
-      and putting reps in on infrastructure-as-code and container orchestration
-      to round out the platform engineering side.
-    </p>
-    <p>
-      Most recently built <a href="https://derekbartlett.com/golden-path-pipeline/">Golden Path</a>
-      &mdash; a deployment pipeline that judges a release on statistics rather than
-      on human distinction. It is the piece of my day job I find
-      most interesting, rebuilt somewhere I could take it further.
-    </p>
-    <p>
-      Open to new roles. The right fit is somewhere I can build the
-      paved path rather than just walk it.
-    </p>
-  </section>
+<!-- START MENU -->
+<div id="start-menu">
+  <div class="start-menu-sidebar"><span>Derek OS</span></div>
+  <div class="start-menu-items">
+    <div class="sm-item" id="sm-programs-wrap">
+      <span>&#x1F4C1;</span> Programs <span class="sm-arrow">&#x25BA;</span>
+      <div id="sm-programs-sub">
+        <div class="ctx-item" onclick="smAction('about')">&#x1F464; about.exe</div>
+        <div class="ctx-item" onclick="smAction('projects')">&#x1F4C1; projects/</div>
+        <div class="ctx-item" onclick="smAction('skills')">&#x1F4C4; skills.json</div>
+        <div class="ctx-item" onclick="smAction('contact')">&#x2709;&#xFE0F; contact.txt</div>
+      </div>
+    </div>
+    <div class="sm-sep"></div>
+    <div class="sm-item" onclick="hideStartMenu();window.print()">&#x1F5A8; Print Resume...</div>
+    <div class="sm-item" onclick="hideStartMenu();window.open('https://github.com/DBITK','_blank')">&#x1F517; GitHub</div>
+    <div class="sm-item" onclick="hideStartMenu();window.open('https://linkedin.com/in/DBIT','_blank')">&#x1F517; LinkedIn</div>
+    <div class="sm-sep"></div>
+    <div class="sm-item" onclick="hideStartMenu();showShutdown()">&#x23FB; Shut Down...</div>
+  </div>
+</div>
 
-  <hr />
+<!-- SHUTDOWN DIALOG -->
+<div id="shutdown-dlg">
+  <div class="shutdown-titlebar">Shut Down Derek OS</div>
+  <div class="shutdown-body">
+    <p>&#x1F4BB; Are you sure you want to shut down?<br><br><em>All unsaved portfolio impressions will be lost.</em></p>
+  </div>
+  <div class="shutdown-footer">
+    <button class="shutdown-btn" onclick="document.getElementById('shutdown-dlg').classList.remove('show')">Cancel</button>
+    <button class="shutdown-btn" onclick="shutdownSequence()">Shut Down</button>
+  </div>
+</div>
 
-  <!-- ============================ PROJECTS -->
-  <section>
-    <h2>Projects</h2>
-    <p class="muted" style="margin-bottom: 22px;">
-      Representative systems I’ve built, operated, or used to sharpen platform engineering skills.
-    </p>
+<!-- RESUME (print only) -->
+<div id="resume-print">
+  <h1>Derek Bartlett</h1>
+  <div class="r-contact">Platform &amp; DevOps Engineer &nbsp;|&nbsp; Grand Rapids, MI (remote) &nbsp;|&nbsp; derek@derekbartlett.com &nbsp;|&nbsp; github.com/DBITK &nbsp;|&nbsp; linkedin.com/in/DBIT &nbsp;|&nbsp; derekbartlett.com</div>
 
-    <ul class="entries">
-      <li class="featured">
-        <div><span class="title">Golden Path</span> <span class="meta">— live, try it</span></div>
-        <p>
-          A deployment pipeline that decides <em>statistically</em> whether a build
-          is allowed to reach production. Each environment deploys a fresh baseline
-          alongside the candidate, drives identical load through both at the same
-          time, and judges the result with a Mann&ndash;Whitney U test and an
-          effect-size gate before performing a red/black traffic switch &mdash; the
-          automated canary analysis Netflix built Kayenta for, implemented from
-          scratch rather than described.
-        </p>
-        <p>
-          The delivery config is declarative: teams state requirements and the
-          orchestrator derives the steps. A weekly drill deliberately ships broken
-          builds and <strong>fails if they get promoted</strong>. The same config
-          compiles to Argo Rollouts manifests, because the methodology outlived the
-          tool it came from.
-        </p>
-        <p class="links">
-          <a href="https://derekbartlett.com/golden-path-pipeline/">interactive demo</a>
-          <span class="sep">·</span>
-          <a href="https://github.com/DBITK/golden-path-pipeline" target="_blank" rel="noopener">source</a>
-          <span class="sep">·</span>
-          <a href="https://github.com/DBITK/golden-path-pipeline/actions" target="_blank" rel="noopener">run the pipeline yourself</a>
-        </p>
-      </li>
+  <h2>Summary</h2>
+  <p>Platform and DevOps engineer building multi-environment delivery systems, progressive delivery pipelines, and the tooling that lets developers self-serve. The right fit is somewhere I can build the paved path rather than just walk it. Open to new roles.</p>
 
-      <li>
-        <div><span class="title">Self-hosted homelab</span> <span class="meta">— retired</span></div>
-        <p>
-          Single-server Proxmox host with RAID 1 storage, every service running
-          as its own VM: TrueNAS, Jellyfin, the Sonarr stack, Home Assistant,
-          and Pi-hole. Treated my own kit like prod &mdash; segmentation,
-          snapshots, and recovery practiced where the consequences are personal
-          rather than political.
-        </p>
-      </li>
+  <h2>Experience</h2>
 
-      <li>
-        <div><span class="title">LoRaWAN IoT network</span> <span class="meta">— research, CMU</span></div>
-        <p>
-          Designed and deployed end-to-end LoRaWAN infrastructure at CMU&rsquo;s
-          DISCR Lab alongside peer institutions. Database, MQTT broker,
-          Grafana dashboards, and the containerized services tying it together.
-        </p>
-      </li>
+  <h3>DevOps Engineer — Revenue Solutions, Inc.</h3>
+  <div class="r-meta">Feb 2021 – Present</div>
+  <p>Building and maintaining multi-environment delivery infrastructure for enterprise tax and revenue applications serving government agencies. Each client implementation spans five to six individually configured tiers with full lifecycle ownership.</p>
+  <ul>
+    <li>Design and maintain Azure DevOps release pipelines executing daily deployments across 70+ client environments</li>
+    <li>Support 10–15 developers with environment-specific configuration and self-service tooling</li>
+    <li>Built PowerShell GUI deployment utilities replacing manual multi-server workflows</li>
+    <li>Customized Azure DevOps process templates, work-item types, and approval gates</li>
+    <li>Provisioned and configured new client environments through standardized cloning</li>
+    <li>Managed infrastructure patching, application configuration, and server maintenance across on-prem and cloud-hosted environments</li>
+  </ul>
 
-      <li>
-        <div><span class="title">Multi-environment delivery platform</span> <span class="meta">— work, RSI</span></div>
-        <p>
-          Azure DevOps release pipelines running daily .NET, Java, SQL, SSRS,
-          and SSIS deployments across seventy-plus individually configured
-          environments for twelve government client implementations. Pipelines,
-          gates, configuration management, and the documentation that lets
-          developers self-serve.
-        </p>
-      </li>
+  <h3>Systems Engineer II — D9 Technologies</h3>
+  <div class="r-meta">May 2020 – Jan 2021</div>
+  <ul>
+    <li>Provisioned and maintained customer environments using Windows Server, VMware, and Hyper-V</li>
+    <li>Conducted security monitoring via Sophos and managed patching cycles across client infrastructure</li>
+  </ul>
 
-      <li>
-        <div><span class="title">Self-service deployment tooling</span> <span class="meta">— work, RSI</span></div>
-        <p>
-          PowerShell GUI utilities that replaced manual multi-server deployment
-          workflows, plus environment reset utilities that take routine ops work
-          off the team&rsquo;s plate. Paving-the-path work, before I had the
-          vocabulary for it.
-        </p>
-      </li>
+  <h2>Projects</h2>
 
-      <!--<li>
-        <div><span class="title">Twitch</span> <span class="meta">— live</span></div>
-        <p>
-          Streaming gaming on a regular cadence. Partly the fun of it,
-          partly an excuse to keep tweaking the home A/V and encoding stack
-          like it&rsquo;s any other piece of infra. <a href="https://www.twitch.tv/klatjesus" target="_blank" rel="noopener" data-twitch>Watch</a>.
-        </p>
-      </li>-->
-    </ul>
-  </section>
+  <h3>Golden Path <span style="font-weight:normal;font-size:10pt;">(derekbartlett.com/golden-path-pipeline)</span></h3>
+  <p>A deployment pipeline that decides statistically whether a build is allowed to reach production. Each environment deploys a fresh baseline alongside the candidate, drives identical load through both, and judges the result with a Mann-Whitney U test and effect-size gate before performing a red/black traffic switch. Compiles to Argo Rollouts manifests.</p>
 
-  <hr />
+  <h3>Self-hosted Homelab</h3>
+  <p>Single-server Proxmox host with RAID 1 storage. TrueNAS, Jellyfin, Sonarr stack, Home Assistant, Pi-hole. Treated personal kit like prod — segmentation, snapshots, and recovery drills.</p>
 
-  <!-- ============================ SKILLS -->
-  <section>
-    <h2>Skills</h2>
-    <p>
-      <strong>Delivery &amp; release engineering.</strong> Azure DevOps end-to-end
-      &mdash; Pipelines, Repos, Boards, work-item customization. GitHub Actions.
-      Release management, SDLC process design, JAMS scheduling.
-    </p>
-    <p>
-      <strong>Progressive delivery.</strong> Automated canary analysis, red/black
-      deployments, and declarative promotion gates. Built the statistical judge
-      behind <a href="https://derekbartlett.com/golden-path-pipeline/">Golden Path</a>
-      &mdash; rank-based significance testing with effect-size gating &mdash; and
-      the mapping from that model onto Argo Rollouts.
-    </p>
-    <p>
-      <strong>Cloud &amp; IaC.</strong> Azure and AWS in production. Terraform
-      Associate in progress; building real-world reps where I can.
-    </p>
-    <p>
-      <strong>Infrastructure.</strong> Windows Server 2016&ndash;2022, Active
-      Directory, DNS, DHCP, IIS. VMware ESXi/vSphere, Hyper-V, Proxmox.
-    </p>
-    <p>
-      <strong>Scripting.</strong> PowerShell as a first language for tooling.
-      Python for delivery tooling &mdash; the Golden Path orchestrator, its
-      statistics, and its test suite. SQL daily. .NET deployment pipelines.
-      Working exposure to JavaScript, React, and HTML/CSS.
-    </p>
-    <p>
-      <strong>Data &amp; observability.</strong> SQL Server, SSRS, SSIS.
-      Grafana, Kibana, application log analysis.
-    </p>
-    <p>
-      <strong>Platforms.</strong> Git. Linux on Debian, Ubuntu, Alpine.
-      ServiceNow, OpenText Content Server.
-    </p>
-  </section>
+  <h3>LoRaWAN IoT Network — CMU DISCR Lab</h3>
+  <p>Designed and deployed end-to-end LoRaWAN infrastructure alongside peer institutions. Database, MQTT broker, Grafana dashboards, containerized services.</p>
 
-  <hr />
+  <h3>Multi-environment Delivery Platform — RSI</h3>
+  <p>Azure DevOps release pipelines running daily .NET, Java, SQL, SSRS, and SSIS deployments across 70+ individually configured environments for 12 government client implementations.</p>
 
-  <!-- ============================ EXPERIENCE -->
-  <section>
-    <h2>Experience</h2>
+  <h2>Skills</h2>
+  <div class="r-skills-grid">
+    <div><strong>CI/CD:</strong> Azure DevOps, GitHub Actions, JAMS</div>
+    <div><strong>Release:</strong> Pipelines, Boards, SDLC process design</div>
+    <div><strong>Progressive Delivery:</strong> canary analysis, red/black, Argo Rollouts, Mann-Whitney U</div>
+    <div><strong>Cloud:</strong> Azure, AWS</div>
+    <div><strong>IaC:</strong> Terraform (Associate in progress)</div>
+    <div><strong>OS:</strong> Windows Server 2016–2022, Debian, Ubuntu, Alpine</div>
+    <div><strong>Virtualization:</strong> VMware ESXi/vSphere, Hyper-V, Proxmox</div>
+    <div><strong>Services:</strong> AD, DNS, DHCP, IIS</div>
+    <div><strong>Languages:</strong> PowerShell, Python, SQL; exposure to JavaScript, React, HTML/CSS</div>
+    <div><strong>Monitoring:</strong> Grafana, Kibana</div>
+    <div><strong>Data:</strong> SQL Server, SSRS, SSIS</div>
+    <div><strong>Tools:</strong> Git, ServiceNow, OpenText Content Server</div>
+  </div>
 
-    <ul class="entries">
-      <li>
-        <div><span class="title">DevOps Engineer</span> <span class="meta meta--exp">Revenue Solutions, Inc. · Feb 2021 &ndash; present</span></div>
-        <p>
-          Building and maintaining multi-environment delivery infrastructure
-          for enterprise tax and revenue applications serving government
-          agencies. Each client implementation spans five to six individually
-          configured tiers (Dev, Test, MOD, Preprod, Production) with full
-          lifecycle ownership from initial provisioning through production
-          release.
-        </p>
-        <p>
-          Design and maintain Azure DevOps release pipelines executing daily
-          deployments across all client environments, supporting ten to fifteen
-          developers with environment-specific configuration. Built developer
-          self-service tooling and environment reset utilities to remove ops
-          dependency from routine tasks. Wrote PowerShell GUI deployment
-          utilities replacing manual multi-server workflows. Customized Azure
-          DevOps process templates, work-item types, and approval gates.
-          Authored release pipeline documentation enabling team self-service.
-          Provisioned and configured new client environments through
-          standardized cloning. Managed infrastructure patching, application
-          configuration, and server maintenance across on-prem and cloud-hosted
-          client environments.
-        </p>
-      </li>
+  <h2>Education</h2>
+  <h3>B.S., Information Technology — Central Michigan University</h3>
+  <div class="r-meta">Aug 2019 &nbsp;|&nbsp; Specialization: Systems Administration and Networking &nbsp;|&nbsp; Dean's List</div>
+  <p>Research: DISCR Lab, LoRaWAN IoT network infrastructure</p>
+</div>
 
-      <li>
-        <div><span class="title">Systems Engineer II</span> <span class="meta meta--exp">D9 Technologies · May 2020 &ndash; Jan 2021</span></div>
-        <p>
-          Provisioned and maintained customer environments using Windows
-          Server, VMware, and Hyper-V. Conducted security monitoring via Sophos
-          and managed patching cycles across client infrastructure.
-        </p>
-      </li>
-
-      <li>
-        <div><span class="title">B.S., Information Technology</span> <span class="meta meta--exp">Central Michigan University · Aug 2019</span></div>
-        <p>
-          Specialization in Systems Administration and Networking; Dean&rsquo;s
-          List. Research at the DISCR Lab on LoRaWAN IoT network infrastructure
-          alongside peer institutions.
-        </p>
-      </li>
-    </ul>
-  </section>
-
-  <hr />
-
-  <!-- ============================ OFF THE CLOCK -->
-  <section>
-    <h2>Off the clock</h2>
-    <p>
-      I am a musician who loves to tinker with tech. Lots of troubleshooting with 3d printers, food recipes and jazz solos. Big gamer, used to be semi pro in a few PC titles.
-    </p>
-  </section>
-
-  <hr />
-
-  <!-- ============================ CONTACT -->
-  <section>
-    <h2>Contact</h2>
-    <p>
-      Best way to reach me: <a href="mailto:derek@derekbartlett.com">derek@derekbartlett.com</a>.
-      You can also reach me on
-      <a href="https://www.linkedin.com/in/DBIT" target="_blank" rel="noopener">LinkedIn</a>,
-      check out my 
-      <a href="https://github.com/DBITK" target="_blank" rel="noopener">GitHub</a> as well!
-     
-    </p>
-  </section>
-
-  <footer>
-    <p>© <span id="year"></span> Derek Bartlett · Grand Rapids, MI · hand-rolled HTML, no trackers</p>
-  </footer>
-
-</main>
+<!-- TASKBAR -->
+<div id="taskbar">
+  <button class="start-btn" onclick="toggleStart()">
+    <div class="start-logo">
+      <span>&#x2588;</span><span>&#x2588;</span><span>&#x2588;</span><span>&#x2588;</span>
+    </div>
+    &nbsp;Start
+  </button>
+  <div class="taskbar-sep"></div>
+  <div class="taskbar-tabs" id="taskbar-tabs"></div>
+  <div class="system-tray">
+    <span id="tray-date"></span>
+    <span id="tray-clock">00:00</span>
+  </div>
+</div>
 
 <script>
-  // Year auto-update
-  document.getElementById('year').textContent = new Date().getFullYear();
-  
-</script>
+/* =============================================================
+   STARFIELD
+   ============================================================= */
+(function() {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  const STAR_COUNT = 80;
+  let stars = [];
+  let W, H;
 
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.4 + 0.3,
+        speed: Math.random() * 0.15 + 0.03,
+        opacity: Math.random() * 0.7 + 0.3
+      });
+    }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#050510';
+    ctx.fillRect(0, 0, W, H);
+    for (let s of stars) {
+      ctx.globalAlpha = s.opacity;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+      s.y += s.speed;
+      if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(tick);
+  }
+
+  resize();
+  initStars();
+  window.addEventListener('resize', () => { resize(); initStars(); });
+  tick();
+})();
+
+/* =============================================================
+   MOBILE DETECTION
+   ============================================================= */
+(function() {
+  const isMobile = window.innerWidth < 768 || ('ontouchstart' in window && window.innerWidth < 1024);
+  if (isMobile) {
+    document.getElementById('mobile-fallback').classList.add('show');
+    // Hide boot, desktop, taskbar, starfield
+    document.getElementById('boot').style.display = 'none';
+    document.getElementById('desktop').style.display = 'none';
+    document.getElementById('taskbar').style.display = 'none';
+    document.getElementById('starfield').style.display = 'none';
+    // Stop all further JS by marking boot as done without running it
+    window.__mobileMode = true;
+  }
+})();
+
+/* =============================================================
+   BOOT SEQUENCE
+   ============================================================= */
+(function() {
+  if (window.__mobileMode) return;
+  const lines = [
+    { id: 'bl0',  delay: 120  },
+    { id: 'bl1',  delay: 320  },
+    { id: 'bl2',  delay: 500  },
+    { id: 'bl3',  delay: 720  },
+    { id: 'bl4',  delay: 1000 },
+    { id: 'bl5',  delay: 1280 },
+    { id: 'bl6',  delay: 1560 },
+    { id: 'bl7',  delay: 1860 },
+    { id: 'bl8',  delay: 2180 },
+    { id: 'bl9',  delay: 2480 },
+    { id: 'bl10', delay: 2780 },
+  ];
+
+  lines.forEach(l => {
+    setTimeout(() => {
+      document.getElementById(l.id).classList.add('visible');
+    }, l.delay);
+  });
+
+  // progress bar at 3000ms
+  setTimeout(() => {
+    const wrap = document.getElementById('boot-progress-wrap');
+    const bar  = document.getElementById('boot-progress-bar');
+    const pct  = document.getElementById('boot-pct');
+    wrap.style.display = 'block';
+    let progress = 0;
+    const interval = setInterval(() => {
+      const step = Math.random() * 8 + 2;
+      progress = Math.min(100, progress + step);
+      bar.style.width = progress + '%';
+      pct.textContent = Math.floor(progress) + '%';
+      if (progress >= 100) {
+        clearInterval(interval);
+        bar.style.width = '100%';
+        pct.textContent = '100%';
+        setTimeout(() => {
+          document.getElementById('boot-ready').style.display = 'block';
+          setTimeout(() => {
+            const boot = document.getElementById('boot');
+            boot.style.opacity = '0';
+            setTimeout(() => {
+              boot.style.display = 'none';
+              const desktop = document.getElementById('desktop');
+              desktop.classList.add('visible');
+              showWelcome();
+            }, 600);
+          }, 400);
+        }, 200);
+      }
+    }, 35);
+  }, 3000);
+})();
+
+/* =============================================================
+   WELCOME DIALOG
+   ============================================================= */
+function showWelcome() {
+  const dlg = document.getElementById('win-welcome');
+  dlg.classList.add('open');
+
+  const msg = "Hey, I'm Derek — Platform & DevOps engineer. " +
+              "This is my portfolio. Double-click any icon on the left to explore.";
+  const el  = document.getElementById('welcome-text');
+  const cur  = document.getElementById('welcome-cursor');
+  el.textContent = '';
+  let i = 0;
+
+  function typeNext() {
+    if (i === 0) cur.style.display = 'inline-block';
+    if (i < msg.length) {
+      el.textContent += msg[i++];
+      setTimeout(typeNext, i < 5 ? 60 : 28);
+    } else {
+      // typing done — show hint box and button
+      cur.style.display = 'none';
+      setTimeout(() => {
+        document.getElementById('welcome-hint').style.display = 'block';
+        document.getElementById('welcome-ok').style.display  = 'block';
+      }, 200);
+    }
+  }
+  setTimeout(typeNext, 400);
+}
+
+function dismissWelcome() {
+  const dlg = document.getElementById('win-welcome');
+  dlg.style.transition = 'opacity 150ms ease, transform 150ms ease';
+  dlg.style.opacity = '0';
+  dlg.style.transform = 'translate(-50%, -48%) scale(0.96)';
+  setTimeout(() => {
+    dlg.style.display = 'none';
+    // Check hash for deep link, otherwise open about
+    const hash = window.location.hash.replace('#', '').toLowerCase();
+    const validIds = ['about', 'projects', 'skills', 'contact'];
+    if (hash && validIds.includes(hash)) {
+      openWindow(hash);
+    } else {
+      openWindow('about');
+    }
+  }, 160);
+}
+
+/* =============================================================
+   WINDOW MANAGEMENT
+   ============================================================= */
+let zCounter = 20;
+const openWindows = {};   // id → { minimized: bool, title, icon }
+const windowMeta = {
+  about:    { title: 'about.exe',              icon: '👤' },
+  projects: { title: 'projects/ — Explorer',   icon: '📁' },
+  skills:   { title: 'skills.json',            icon: '📄' },
+  contact:  { title: 'contact.txt — Notepad',  icon: '✉' },
+  hackman:  { title: '??? — Unknown Program',  icon: '❓' },
+};
+
+/* iconOpen: called from desktop icon double-click; sets URL hash */
+function iconOpen(id) {
+  const linkable = ['about', 'projects', 'skills', 'contact'];
+  if (linkable.includes(id)) {
+    history.replaceState(null, '', '#' + id);
+  }
+  openWindow(id);
+}
+
+function openWindow(id) {
+  const win = document.getElementById('win-' + id);
+  if (!win) return;
+  win.classList.add('open');
+  win.classList.remove('minimized');
+  bringToFront(win);
+
+  if (!openWindows[id]) {
+    openWindows[id] = { minimized: false };
+    addTaskbarTab(id);
+  } else {
+    openWindows[id].minimized = false;
+    updateTaskbarTab(id, false);
+  }
+
+  // hackman title screen click handler
+  if (id === 'hackman' && !hackmanInited) {
+    initHackmanTitleListeners();
+    hackmanInited = true;
+  }
+}
+
+function closeWindow(id) {
+  const win = document.getElementById('win-' + id);
+  if (!win) return;
+  win.classList.remove('open');
+  win.classList.remove('minimized');
+  delete openWindows[id];
+  removeTaskbarTab(id);
+  if (id === 'hackman') { hackmanStop(); }
+}
+
+function minimizeWindow(id) {
+  const win = document.getElementById('win-' + id);
+  if (!win) return;
+  win.classList.add('minimized');
+  if (openWindows[id]) {
+    openWindows[id].minimized = true;
+    updateTaskbarTab(id, true);
+  }
+}
+
+function bringToFront(win) {
+  zCounter++;
+  win.style.zIndex = zCounter;
+  // update titlebar active state
+  document.querySelectorAll('.win-titlebar').forEach(tb => tb.classList.add('inactive'));
+  const tb = win.querySelector('.win-titlebar');
+  if (tb) tb.classList.remove('inactive');
+}
+
+function focusWindow(id) {
+  const win = document.getElementById('win-' + id);
+  if (!win) return;
+  if (openWindows[id] && openWindows[id].minimized) {
+    win.classList.remove('minimized');
+    openWindows[id].minimized = false;
+    updateTaskbarTab(id, false);
+  }
+  bringToFront(win);
+}
+
+/* Dragging */
+document.querySelectorAll('.win-titlebar').forEach(tb => {
+  tb.addEventListener('mousedown', function(e) {
+    if (e.target.classList.contains('win-btn')) return;
+    const win = tb.closest('.win98-window');
+    bringToFront(win);
+    const startX = e.clientX - win.offsetLeft;
+    const startY = e.clientY - win.offsetTop;
+    function onMove(e) {
+      let nx = e.clientX - startX;
+      let ny = e.clientY - startY;
+      // keep in viewport
+      nx = Math.max(-win.offsetWidth + 60, Math.min(window.innerWidth - 30, nx));
+      ny = Math.max(0, Math.min(window.innerHeight - 56, ny));
+      win.style.left = nx + 'px';
+      win.style.top  = ny + 'px';
+    }
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+});
+
+/* Maximize / Restore on titlebar double-click */
+document.querySelectorAll('.win-titlebar').forEach(tb => {
+  tb.addEventListener('dblclick', function(e) {
+    if (e.target.classList.contains('win-btn')) return;
+    const win = tb.closest('.win98-window');
+    if (!win) return;
+    const isMaximized = win.dataset.maximized === '1';
+    if (!isMaximized) {
+      // Save current geometry
+      win.dataset.prevLeft   = win.style.left;
+      win.dataset.prevTop    = win.style.top;
+      win.dataset.prevWidth  = win.style.width;
+      win.dataset.prevHeight = win.style.height;
+      win.dataset.maximized  = '1';
+      // Fill desktop area (above taskbar)
+      win.style.left   = '0px';
+      win.style.top    = '0px';
+      win.style.width  = window.innerWidth + 'px';
+      win.style.height = (window.innerHeight - 28) + 'px';
+    } else {
+      win.dataset.maximized = '0';
+      win.style.left   = win.dataset.prevLeft   || '60px';
+      win.style.top    = win.dataset.prevTop    || '40px';
+      win.style.width  = win.dataset.prevWidth  || '';
+      win.style.height = win.dataset.prevHeight || '';
+    }
+  });
+});
+
+/* Click window to bring to front */
+document.querySelectorAll('.win98-window').forEach(win => {
+  win.addEventListener('mousedown', function() {
+    bringToFront(win);
+  });
+});
+
+/* Resize handles */
+document.querySelectorAll('.win-resize').forEach(handle => {
+  handle.addEventListener('mousedown', function(e) {
+    e.stopPropagation();
+    const win = handle.closest('.win98-window');
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = win.offsetWidth;
+    const startH = win.offsetHeight;
+    function onMove(e) {
+      win.style.width  = Math.max(280, startW + (e.clientX - startX)) + 'px';
+      win.style.height = Math.max(160, startH + (e.clientY - startY)) + 'px';
+    }
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+});
+
+/* Escape closes topmost */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    // find highest z-index open window
+    let topWin = null, topZ = -1;
+    document.querySelectorAll('.win98-window.open:not(.minimized)').forEach(win => {
+      const z = parseInt(win.style.zIndex || 0);
+      if (z > topZ) { topZ = z; topWin = win; }
+    });
+    if (topWin) {
+      const id = topWin.id.replace('win-', '');
+      closeWindow(id);
+    }
+  }
+  // Hackman Enter key
+  if (e.key === 'Enter' && hackmanTitleVisible) {
+    hackmanStartGame();
+  }
+});
+
+/* =============================================================
+   TASKBAR
+   ============================================================= */
+function addTaskbarTab(id) {
+  const meta = windowMeta[id] || { title: id, icon: '🗔' };
+  const tab = document.createElement('div');
+  tab.className = 'taskbar-tab active';
+  tab.id = 'tab-' + id;
+  tab.innerHTML = meta.icon + ' ' + meta.title;
+  tab.onclick = function() { focusWindow(id); };
+  document.getElementById('taskbar-tabs').appendChild(tab);
+  updateAllTabStates();
+}
+
+function removeTaskbarTab(id) {
+  const tab = document.getElementById('tab-' + id);
+  if (tab) tab.remove();
+}
+
+function updateTaskbarTab(id, minimized) {
+  const tab = document.getElementById('tab-' + id);
+  if (!tab) return;
+  if (minimized) tab.classList.remove('active');
+  else tab.classList.add('active');
+  updateAllTabStates();
+}
+
+function updateAllTabStates() {
+  // The "active" visual = focused (top z-index), not just open
+  // Keep it simple — just ensure tabs exist
+}
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('tray-clock').textContent = h + ':' + m;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('tray-date').textContent =
+    days[now.getDay()] + ' ' + months[now.getMonth()] + ' ' + now.getDate();
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Footer year
+document.getElementById('contact-year').textContent = new Date().getFullYear();
+
+/* =============================================================
+   EXPLORER ROW SELECT
+   ============================================================= */
+function selectRow(row) {
+  document.querySelectorAll('#win-projects .explorer-row').forEach(r => r.classList.remove('selected'));
+  row.classList.add('selected');
+}
+
+/* =============================================================
+   DESKTOP ICON SELECT
+   ============================================================= */
+function selectIcon(icon) {
+  document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+  icon.classList.add('selected');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.desktop-icon') && !e.target.closest('.win98-window')) {
+    document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+  }
+});
+
+/* =============================================================
+   START MENU
+   ============================================================= */
+let startMenuOpen = false;
+
+function toggleStart() {
+  const menu = document.getElementById('start-menu');
+  startMenuOpen = !startMenuOpen;
+  if (startMenuOpen) menu.classList.add('show');
+  else menu.classList.remove('show');
+}
+
+function hideStartMenu() {
+  document.getElementById('start-menu').classList.remove('show');
+  startMenuOpen = false;
+}
+
+function smAction(id) {
+  hideStartMenu();
+  openWindow(id);
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#start-menu') && !e.target.closest('.start-btn')) {
+    hideStartMenu();
+  }
+});
+
+/* =============================================================
+   CONTEXT MENU
+   ============================================================= */
+const ctxMenu = document.getElementById('ctx-menu');
+
+function hideCtxMenu() {
+  ctxMenu.classList.remove('show');
+}
+
+function ctxAction(id) {
+  hideCtxMenu();
+  openWindow(id);
+}
+
+document.addEventListener('contextmenu', function(e) {
+  // Only show on the desktop, not inside a window
+  if (e.target.closest('.win98-window') || e.target.closest('#taskbar')) return;
+  e.preventDefault();
+  // Show first so we can measure, then position
+  ctxMenu.style.left = e.clientX + 'px';
+  ctxMenu.style.top  = e.clientY + 'px';
+  ctxMenu.classList.add('show');
+  const x = Math.min(e.clientX, window.innerWidth  - ctxMenu.offsetWidth  - 4);
+  const y = Math.min(e.clientY, window.innerHeight - ctxMenu.offsetHeight - 4);
+  ctxMenu.style.left = x + 'px';
+  ctxMenu.style.top  = y + 'px';
+});
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#ctx-menu')) hideCtxMenu();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    hideCtxMenu();
+    hideStartMenu();
+    document.getElementById('shutdown-dlg').classList.remove('show');
+  }
+}, true);
+
+/* =============================================================
+   SHUTDOWN
+   ============================================================= */
+function showShutdown() {
+  document.getElementById('shutdown-dlg').classList.add('show');
+}
+
+function shutdownSequence() {
+  document.getElementById('shutdown-dlg').classList.remove('show');
+  const desktop = document.getElementById('desktop');
+  const taskbar = document.getElementById('taskbar');
+  desktop.style.transition = 'opacity 0.4s';
+  taskbar.style.transition = 'opacity 0.4s';
+  desktop.style.opacity = '0';
+  taskbar.style.opacity = '0';
+  setTimeout(() => {
+    document.body.style.background = '#000';
+    document.getElementById('starfield').style.display = 'none';
+    const msg = document.createElement('div');
+    msg.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Courier New",monospace;font-size:16px;color:#fff;background:#000;z-index:999999;';
+    msg.textContent = 'It is now safe to turn off your computer.';
+    document.body.appendChild(msg);
+  }, 500);
+}
+
+/* =============================================================
+   HACKMAN GAME
+   ============================================================= */
+let hackmanInited = false;
+let hackmanTitleVisible = true;
+let hackmanRunning = false;
+let hackmanRAF = null;
+let hackmanAudioCtx = null;
+
+function getAudioCtx() {
+  if (!hackmanAudioCtx) {
+    try { hackmanAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  return hackmanAudioCtx;
+}
+
+function playBeep(freq, dur, type) {
+  const ac = getAudioCtx();
+  if (!ac) return;
+  try {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.type = type || 'square';
+    osc.frequency.setValueAtTime(freq, ac.currentTime);
+    gain.gain.setValueAtTime(0.08, ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + dur);
+  } catch(e) {}
+}
+
+function playDeath() {
+  const ac = getAudioCtx();
+  if (!ac) return;
+  [400, 300, 200, 100].forEach((f, i) => {
+    setTimeout(() => playBeep(f, 0.15, 'sawtooth'), i * 80);
+  });
+}
+
+function initHackmanTitleListeners() {
+  const titleScreen = document.getElementById('hackman-title-screen');
+  titleScreen.addEventListener('click', () => { if (hackmanTitleVisible) hackmanStartGame(); });
+}
+
+const TILE = 20;
+const COLS = 19;
+const ROWS = 15;
+
+// Maze: 1=wall, 0=dot, 2=empty(no dot), 3=power pellet
+const MAZE_TEMPLATE = [
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+  [1,3,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,3,1],
+  [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+  [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+  [1,1,1,1,0,1,1,1,2,2,2,1,1,1,0,1,1,1,1],
+  [1,1,1,1,0,1,2,2,2,2,2,2,2,1,0,1,1,1,1],
+  [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
+  [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
+  [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+  [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+];
+
+let maze, player, ghosts, score, lives, level, totalDots, dotsEaten, powered, powerTimer, gameOver, gameWon;
+
+function hackmanInit() {
+  maze = MAZE_TEMPLATE.map(row => row.slice());
+  totalDots = 0;
+  dotsEaten = 0;
+  maze.forEach(row => row.forEach(c => { if (c === 0 || c === 3) totalDots++; }));
+
+  player = { col: 9, row: 12, dx: 0, dy: 0, nextDx: 0, nextDy: 0, mouth: 0, mouthDir: 1, moveTimer: 0 };
+  ghosts = [
+    { col: 8, row: 9, dx: 1, dy: 0, color: '#ff4444', scatter: false, moveTimer: 0, scatterTimer: 0 },
+    { col: 10, row: 9, dx: -1, dy: 0, color: '#ff44ff', scatter: false, moveTimer: 0, scatterTimer: 0 },
+  ];
+  score = 0;
+  lives = 3;
+  powered = false;
+  powerTimer = 0;
+  gameOver = false;
+  gameWon = false;
+
+  document.getElementById('hm-score').textContent = '0';
+  document.getElementById('hm-lives').textContent = '3';
+  document.getElementById('hm-level').textContent = level || 1;
+  document.getElementById('hackman-overlay').classList.remove('show');
+}
+
+function hackmanStartGame() {
+  hackmanTitleVisible = false;
+  level = 1;
+  document.getElementById('hackman-title-screen').style.display = 'none';
+  const wrap = document.getElementById('hackman-canvas-wrap');
+  wrap.style.display = 'flex';
+  hackmanInit();
+  hackmanRunning = true;
+  hackmanLoop();
+}
+
+function hackmanStop() {
+  hackmanRunning = false;
+  if (hackmanRAF) { cancelAnimationFrame(hackmanRAF); hackmanRAF = null; }
+}
+
+function hackmanRestart() {
+  document.getElementById('hackman-overlay').classList.remove('show');
+  hackmanStop();
+  level = 1;
+  hackmanInit();
+  hackmanRunning = true;
+  hackmanLoop();
+}
+
+// ms per tile move (133ms = 8 frames @ 60fps; independent of display refresh rate)
+const PLAYER_MS_BASE = 133;
+const GHOST_MS_BASE  = 167;
+let frameCount = 0;
+
+function hackmanLoop(timestamp) {
+  if (!hackmanRunning) return;
+  hackmanRAF = requestAnimationFrame(hackmanLoop);
+  frameCount++;
+
+  const PLAYER_MS = Math.max(66, PLAYER_MS_BASE - (level - 1) * 16);
+  const GHOST_MS  = Math.max(100, GHOST_MS_BASE  - (level - 1) * 16);
+
+  // player movement
+  if (timestamp - player.moveTimer >= PLAYER_MS) {
+    player.moveTimer = timestamp;
+    // try queued direction first
+    const nr = player.row + player.nextDy;
+    const nc = player.col + player.nextDx;
+    if (isPassable(nr, nc)) {
+      player.dy = player.nextDy;
+      player.dx = player.nextDx;
+    }
+    const mr = player.row + player.dy;
+    const mc = player.col + player.dx;
+    if (isPassable(mr, mc)) {
+      player.row = mr;
+      player.col = mc;
+      // wrap
+      if (player.col < 0)    player.col = COLS - 1;
+      if (player.col >= COLS) player.col = 0;
+    }
+    // eat dot
+    const cell = maze[player.row][player.col];
+    if (cell === 0) {
+      maze[player.row][player.col] = 2;
+      score += 10;
+      dotsEaten++;
+      playBeep(880, 0.05, 'square');
+    } else if (cell === 3) {
+      maze[player.row][player.col] = 2;
+      score += 50;
+      dotsEaten++;
+      powered = true;
+      powerTimer = 180;
+      playBeep(440, 0.15, 'sine');
+    }
+    document.getElementById('hm-score').textContent = score;
+    if (dotsEaten >= totalDots) {
+      gameWon = true;
+      hackmanShowOverlay('ALL BYTES CONSUMED', 'MAINFRAME ACCESSED', '#00ff44');
+      return;
+    }
+  }
+
+  // power timer
+  if (powered) {
+    powerTimer--;
+    if (powerTimer <= 0) { powered = false; }
+  }
+
+  // ghost movement
+  ghosts.forEach(g => {
+    if (timestamp - g.moveTimer >= GHOST_MS) {
+      g.moveTimer = timestamp;
+      // try to move in current direction, else pick random passable
+      const dirs = [{dr:-1,dc:0},{dr:1,dc:0},{dr:0,dc:-1},{dr:0,dc:1}];
+      let moved = false;
+      const nr = g.row + g.dy;
+      const nc = g.col + g.dx;
+      if (isPassable(nr, nc) && Math.random() > 0.25) {
+        g.row = nr; g.col = nc; moved = true;
+      }
+      if (!moved) {
+        const shuffled = dirs.sort(() => Math.random() - 0.5);
+        for (let d of shuffled) {
+          if (isPassable(g.row + d.dr, g.col + d.dc)) {
+            g.row += d.dr; g.col += d.dc;
+            g.dy = d.dr; g.dx = d.dc;
+            break;
+          }
+        }
+      }
+    }
+    // collision with player
+    if (g.row === player.row && g.col === player.col) {
+      if (powered) {
+        // eat ghost
+        score += 200;
+        g.row = 9; g.col = 9;
+        playBeep(660, 0.2, 'sine');
+      } else {
+        lives--;
+        playDeath();
+        document.getElementById('hm-lives').textContent = lives;
+        if (lives <= 0) {
+          gameOver = true;
+          hackmanShowOverlay('VIRUS DETECTED', 'SYSTEM TERMINATED', '#ff4444');
+          return;
+        }
+        // respawn player
+        player.col = 9; player.row = 12; player.dx = 0; player.dy = 0;
+      }
+    }
+  });
+
+  // mouth animation
+  player.mouth += 0.18 * player.mouthDir;
+  if (player.mouth > 0.45) player.mouthDir = -1;
+  if (player.mouth < 0)    { player.mouth = 0; player.mouthDir = 1; }
+
+  hackmanDraw();
+}
+
+function isPassable(row, col) {
+  if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
+  return maze[row][col] !== 1;
+}
+
+function hackmanDraw() {
+  const canvas = document.getElementById('hackman-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000011';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // draw maze
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const x = c * TILE, y = r * TILE;
+      const cell = maze[r][c];
+      if (cell === 1) {
+        ctx.fillStyle = '#0044aa';
+        ctx.fillRect(x, y, TILE, TILE);
+        // circuit board highlight
+        ctx.strokeStyle = '#0066ff';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + 0.5, y + 0.5, TILE - 1, TILE - 1);
+      } else if (cell === 0) {
+        ctx.fillStyle = '#00ccff';
+        ctx.fillRect(x + TILE/2 - 2, y + TILE/2 - 2, 4, 4);
+      } else if (cell === 3) {
+        // power pellet
+        const pulse = 0.5 + 0.5 * Math.sin(frameCount * 0.1);
+        ctx.fillStyle = `rgba(0,255,200,${0.6 + 0.4 * pulse})`;
+        ctx.beginPath();
+        ctx.arc(x + TILE/2, y + TILE/2, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  // draw player (Pac-Man)
+  const px = player.col * TILE + TILE/2;
+  const py = player.row * TILE + TILE/2;
+  // determine angle based on direction
+  let angle = 0;
+  if (player.dx === 1)  angle = 0;
+  if (player.dx === -1) angle = Math.PI;
+  if (player.dy === -1) angle = -Math.PI/2;
+  if (player.dy === 1)  angle = Math.PI/2;
+  const mouthAngle = player.mouth * Math.PI;
+  ctx.fillStyle = '#ffff00';
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.arc(px, py, TILE/2 - 1, angle + mouthAngle, angle + Math.PI*2 - mouthAngle);
+  ctx.closePath();
+  ctx.fill();
+
+  // draw ghosts
+  ghosts.forEach(g => {
+    const gx = g.col * TILE + TILE/2;
+    const gy = g.row * TILE + TILE/2;
+    const R = TILE/2 - 1;
+    const col = powered ? '#4444ff' : g.color;
+    ctx.fillStyle = col;
+    // body
+    ctx.beginPath();
+    ctx.arc(gx, gy - 1, R, Math.PI, 0);
+    ctx.lineTo(gx + R, gy + R);
+    // wavy bottom
+    for (let i = 0; i < 3; i++) {
+      const wx = gx + R - (i * R * 2/3) - R/3;
+      ctx.quadraticCurveTo(wx + R/3, gy + R + (i % 2 === 0 ? -3 : 3), wx, gy + R);
+    }
+    ctx.lineTo(gx - R, gy - 1);
+    ctx.closePath();
+    ctx.fill();
+    // eyes
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(gx - 4, gy - 3, 3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(gx + 4, gy - 3, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = powered ? '#88f' : '#00f';
+    ctx.beginPath(); ctx.arc(gx - 4 + g.dx, gy - 3 + g.dy, 1.5, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(gx + 4 + g.dx, gy - 3 + g.dy, 1.5, 0, Math.PI*2); ctx.fill();
+  });
+}
+
+function hackmanShowOverlay(msg, sub, color) {
+  hackmanRunning = false;
+  const overlay = document.getElementById('hackman-overlay');
+  const omsg = document.getElementById('hackman-overlay-msg');
+  const osub = document.getElementById('hackman-overlay-sub');
+  omsg.textContent = msg;
+  omsg.style.color = color;
+  osub.textContent = sub;
+  overlay.classList.add('show');
+}
+
+// Keyboard controls
+document.addEventListener('keydown', function(e) {
+  if (!hackmanRunning) return;
+  switch(e.key) {
+    case 'ArrowLeft':  case 'a': case 'A': player.nextDx = -1; player.nextDy = 0; e.preventDefault(); break;
+    case 'ArrowRight': case 'd': case 'D': player.nextDx =  1; player.nextDy = 0; e.preventDefault(); break;
+    case 'ArrowUp':    case 'w': case 'W': player.nextDy = -1; player.nextDx = 0; e.preventDefault(); break;
+    case 'ArrowDown':  case 's': case 'S': player.nextDy =  1; player.nextDx = 0; e.preventDefault(); break;
+  }
+});
+</script>
 </body>
 </html>
