@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: grsb-backend
+    env: node
+    rootDir: grsb-backend
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GRSB_ADMIN_TOKEN
+        sync: false
+      - key: GRSB_GITHUB_TOKEN
+        sync: false
+      - key: GRSB_GITHUB_REPO
+        value: DBITK/DBITK.github.io
+      - key: GRSB_GITHUB_BRANCH
+        value: main
+      - key: GRSB_GITHUB_CONTENT_PREFIX
+        value: grsb/content
+      - key: GRSB_GITHUB_COMMITTER_NAME
+        value: GRSB Website Editor
+      - key: GRSB_GITHUB_COMMITTER_EMAIL
+        value: grsymphonicband@gmail.com

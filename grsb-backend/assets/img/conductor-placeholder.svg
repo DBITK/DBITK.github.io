@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" role="img" aria-label="Conductor photo placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a3344"/>
+      <stop offset="1" stop-color="#571726"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="720" fill="url(#bg)"/>
+  <circle cx="300" cy="280" r="120" fill="#a8915f" opacity="0.20"/>
+  <circle cx="300" cy="250" r="78" fill="#a8915f" opacity="0.6"/>
+  <path d="M170 470 Q300 350 430 470 L430 560 L170 560 Z" fill="#a8915f" opacity="0.6"/>
+  <text x="300" y="630" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#f7f3ea">Barry D. Martin</text>
+  <text x="300" y="668" text-anchor="middle" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="18" fill="#c8b585" letter-spacing="2">PHOTO PLACEHOLDER</text>
+</svg>

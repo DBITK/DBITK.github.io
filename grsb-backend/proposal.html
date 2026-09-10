@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Website Remodel Proposal | Grand Rapids Symphonic Band</title>
+  <meta name="description" content="A proposal website for the Grand Rapids Symphonic Band remodel, including launch scope, content update workflow, and adoption plan." />
+  <link rel="icon" href="assets/img/grsblogo.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav">
+      <a href="index.html" class="brand">
+        <img src="assets/img/grsblogo.png" alt="Grand Rapids Symphonic Band" />
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="proposal.html" class="active">Proposal</a></li>
+        <li><a href="concerts.html">Concerts</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="conductor.html">Conductor</a></li>
+        <li><a href="auditions.html">Auditions</a></li>
+        <li><a href="youth-soloist.html">Youth Soloist</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="support.html" class="btn btn--primary">Donate</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="page-banner">
+    <h1>Website Remodel Proposal</h1>
+    <p>A modern public site with an update workflow volunteers can actually maintain</p>
+  </section>
+
+  <section class="section tone-paper">
+    <div class="container grid grid--2" style="align-items:start;gap:40px">
+      <div class="prose">
+        <p class="eyebrow">Why Remodel</p>
+        <div class="divider divider--left"></div>
+        <h2>The current site is overdue for a cleaner public face</h2>
+        <p>The proposed site gives the Grand Rapids Symphonic Band a polished, mobile-friendly home for concerts, tickets, auditions, youth soloist information, donations, recordings, and contact details.</p>
+        <p>It uses the assets prepared in this folder, including the band logo, ensemble photography, conductor photography, donation QR code, and locally bundled fonts.</p>
+      </div>
+      <div class="proposal-panel">
+        <h3>Proposal Status</h3>
+        <div class="proposal-check"><b>Live preview</b><span>Published for review on the internet.</span></div>
+        <div class="proposal-check"><b>Content model</b><span>Concerts and audio are editable through JSON-backed content files.</span></div>
+        <div class="proposal-check"><b>Admin path</b><span>No-login editor works now; token-protected backend supports GitHub-backed Sites saves or Node hosting.</span></div>
+        <div class="proposal-check"><b>Launch path</b><span>Point the official domain after board approval and hosting choice.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tone-cream">
+    <div class="container">
+      <div class="center" style="margin-bottom:38px">
+        <p class="eyebrow">What Is Included</p>
+        <div class="divider"></div>
+        <h2>Functional remodel scope</h2>
+      </div>
+      <div class="grid grid--3">
+        <div class="card"><h3>Public Pages</h3><p style="color:var(--ink-soft);margin-top:8px">Home, concerts, about, conductor, auditions, youth soloist, support, contact, and this proposal page.</p></div>
+        <div class="card"><h3>Audience Tools</h3><p style="color:var(--ink-soft);margin-top:8px">Ticket links, donation options, venue details, contact paths, and a responsive mobile navigation.</p></div>
+        <div class="card"><h3>Media</h3><p style="color:var(--ink-soft);margin-top:8px">A custom audio player with local-file support and remote streaming fallback.</p></div>
+        <div class="card"><h3>Content Editing</h3><p style="color:var(--ink-soft);margin-top:8px">A browser editor at <a href="admin/editor.html">/admin/editor.html</a> for concerts and audio data.</p></div>
+        <div class="card"><h3>Backend Ready</h3><p style="color:var(--ink-soft);margin-top:8px">Token-protected GitHub-backed and Node backend paths are included for direct saves from the admin editor.</p></div>
+        <div class="card"><h3>Deployment</h3><p style="color:var(--ink-soft);margin-top:8px">The proposal is deployed publicly and can be reviewed before moving the official domain.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tone-paper">
+    <div class="container grid grid--2" style="align-items:start;gap:40px">
+      <div class="prose">
+        <p class="eyebrow">Admin Workflow</p>
+        <div class="divider divider--left"></div>
+        <h2>How updates work</h2>
+        <p>Today, a webmaster can open the editor, update site settings, concerts, or audio tracks, validate the fields, and download replacement JSON files on the static preview.</p>
+        <p>With GitHub-backed Sites secrets or Node-capable hosting configured, the same editor detects the backend, enables Save buttons, and persists updates through token-protected API endpoints.</p>
+      </div>
+      <div class="proposal-panel">
+        <h3>Recommended next steps</h3>
+        <ol class="proposal-steps">
+          <li>Review the proposal site on desktop and mobile.</li>
+          <li>Choose the long-term host and repository owner.</li>
+          <li>Configure the GitHub-backed API or deploy the Node backend, then set the admin token.</li>
+          <li>Point the official domain after approval.</li>
+        </ol>
+        <a href="admin/editor.html" class="btn btn--primary" style="margin-top:18px">Open Content Editor</a>
+        <a href="backend.html" class="btn btn--ghost" style="margin-top:12px">View Backend Plan</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tone-navy">
+    <div class="container center">
+      <p class="eyebrow" style="color:var(--brass-light)">Decision Point</p>
+      <h2>Ready for review, with a clear path to launch</h2>
+      <p class="lead" style="max-width:720px;margin:14px auto 26px">This proposal demonstrates the public experience and the maintenance workflow. The remaining launch choice is where the organization wants the editable source of truth and production secrets to live.</p>
+      <div class="hero-actions">
+        <a href="index.html" class="btn btn--light">View Proposed Site</a>
+        <a href="contact.html" class="btn btn--primary">Contact the Band</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/img/grsblogo.png" alt="Grand Rapids Symphonic Band" />
+          <p>A premier auditioned adult community band fostering excellence in performance and enriching the cultural life of West Michigan since 1978.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <a href="proposal.html">Website Remodel Proposal</a>
+          <a href="backend.html">Backend Deployment Plan</a>
+          <a href="concerts.html">Concerts &amp; Tickets</a>
+          <a href="about.html">About the Band</a>
+          <a href="conductor.html">Our Conductor</a>
+          <a href="auditions.html">Auditions</a>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <a href="tel:6163361554">616-336-1554</a>
+          <a href="mailto:grsymphonicband@gmail.com">grsymphonicband@gmail.com</a>
+          <a href="https://facebook.com/grsband" target="_blank" rel="noopener">Facebook</a>
+          <a href="support.html">Donate</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Grand Rapids Symphonic Band · Proposal Preview</span>
+        <span>Modernized website proposal · West Michigan</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

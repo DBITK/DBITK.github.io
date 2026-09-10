@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backend Deployment Plan | Grand Rapids Symphonic Band</title>
+  <meta name="description" content="Backend deployment plan for the Grand Rapids Symphonic Band website proposal, including admin editing, health checks, and hosting options." />
+  <link rel="icon" href="assets/img/grsblogo.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav">
+      <a href="index.html" class="brand">
+        <img src="assets/img/grsblogo.png" alt="Grand Rapids Symphonic Band" />
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="proposal.html">Proposal</a></li>
+        <li><a href="backend.html" class="active">Backend</a></li>
+        <li><a href="concerts.html">Concerts</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="support.html" class="btn btn--primary">Donate</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="page-banner">
+    <h1>Backend Deployment Plan</h1>
+    <p>How the proposal becomes a save-capable website for a webmaster</p>
+  </section>
+
+  <section class="section tone-paper">
+    <div class="container grid grid--2" style="align-items:start;gap:40px">
+      <div class="prose">
+        <p class="eyebrow">What Is Ready</p>
+        <div class="divider divider--left"></div>
+        <h2>A real editing backend is included</h2>
+        <p>The public proposal can run as a static preview, and it can also expose a token-protected serverless API that commits content edits back to GitHub when production secrets are configured.</p>
+        <p>The repository also includes a Node.js backend for hosts with persistent disk. In either mode, the editor at <code>/admin/editor.html</code> detects the backend, reports its health and persistence mode, loads the editable JSON from it, enables Save buttons, and persists changes through the same API paths.</p>
+      </div>
+      <div class="proposal-panel">
+        <h3>Backend Endpoints</h3>
+        <div class="proposal-check"><b>Health</b><span><code>GET /api/health</code></span></div>
+        <div class="proposal-check"><b>Site settings</b><span><code>GET/PUT /api/content/site</code></span></div>
+        <div class="proposal-check"><b>Concerts</b><span><code>GET/PUT /api/content/concerts</code></span></div>
+        <div class="proposal-check"><b>Audio</b><span><code>GET/PUT /api/content/audio</code></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tone-cream">
+    <div class="container">
+      <div class="center" style="margin-bottom:38px">
+        <p class="eyebrow">Launch Checklist</p>
+        <div class="divider"></div>
+        <h2>Backend hosting steps</h2>
+      </div>
+      <div class="grid grid--3">
+        <div class="card"><h3>1. Choose Backend</h3><p style="color:var(--ink-soft);margin-top:8px">Use GitHub-backed saves on Sites, or deploy the Node backend to Render, Railway, Fly.io, or a VPS.</p></div>
+        <div class="card"><h3>2. Set Admin Secret</h3><p style="color:var(--ink-soft);margin-top:8px">Configure <code>GRSB_ADMIN_TOKEN</code> as a long random value. The editor requires this token before saving.</p></div>
+        <div class="card"><h3>3. Configure Storage</h3><p style="color:var(--ink-soft);margin-top:8px">For Sites, set <code>GRSB_GITHUB_*</code> variables. For Node, set <code>GRSB_CONTENT_DIR</code> to persistent storage.</p></div>
+        <div class="card"><h3>4. Start or Redeploy</h3><p style="color:var(--ink-soft);margin-top:8px">Redeploy Sites after environment changes, or run <code>npm start</code> on the Node host.</p></div>
+        <div class="card"><h3>5. Verify Health</h3><p style="color:var(--ink-soft);margin-top:8px">Open <code>/api/health</code>. It should report <code>ok: true</code>, the persistence mode, and <code>adminApiEnabled: true</code>.</p></div>
+        <div class="card"><h3>6. Test Editor</h3><p style="color:var(--ink-soft);margin-top:8px">Open <code>/admin/editor.html</code>, enter the token, make a small content edit, and save.</p></div>
+        <div class="card"><h3>7. Point Domain</h3><p style="color:var(--ink-soft);margin-top:8px">After approval, point the official domain to the approved production host.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tone-paper">
+    <div class="container grid grid--2" style="align-items:start;gap:40px">
+      <div class="prose">
+        <p class="eyebrow">Quality Gate</p>
+        <div class="divider divider--left"></div>
+        <h2>Repeatable smoke tests</h2>
+        <p>The repository includes <code>npm test</code>, which builds the static proposal, verifies key public routes, confirms the static preview does not expose the write API, starts the Node backend, checks <code>/api/health</code>, verifies authorized saves, and confirms unauthorized writes are rejected.</p>
+        <p>After production secrets or Node hosting are configured, <code>npm run test:production-backend</code> performs a reversible live edit through the public API and restores the original content. A GitHub Actions workflow is also included so local smoke checks run automatically once the project is placed in a GitHub repository.</p>
+      </div>
+      <div class="proposal-panel">
+        <h3>Included Files</h3>
+        <div class="proposal-check"><b>Sites API</b><span><code>build-static.mjs</code></span></div>
+        <div class="proposal-check"><b>Node API</b><span><code>server/node-server.mjs</code></span></div>
+        <div class="proposal-check"><b>Container</b><span><code>Dockerfile</code></span></div>
+        <div class="proposal-check"><b>Render</b><span><code>render.yaml</code></span></div>
+        <div class="proposal-check"><b>GitHub store</b><span><code>GRSB_GITHUB_REPO</code></span></div>
+        <div class="proposal-check"><b>Content path</b><span><code>GRSB_CONTENT_DIR</code></span></div>
+        <div class="proposal-check"><b>Env example</b><span><code>.env.example</code></span></div>
+        <div class="proposal-check"><b>Tests</b><span><code>scripts/smoke-test.mjs</code></span></div>
+        <div class="proposal-check"><b>Live verifier</b><span><code>scripts/verify-production-backend.mjs</code></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tone-navy">
+    <div class="container center">
+      <p class="eyebrow" style="color:var(--brass-light)">Bottom Line</p>
+      <h2>Static preview now, save-capable backend when configured</h2>
+      <p class="lead" style="max-width:720px;margin:14px auto 26px">The proposal can be reviewed immediately, and the same codebase supports GitHub-backed serverless saves or a persistent Node backend when production credentials are configured.</p>
+      <div class="hero-actions">
+        <a href="proposal.html" class="btn btn--light">Back to Proposal</a>
+        <a href="admin/editor.html" class="btn btn--primary">Open Editor</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/img/grsblogo.png" alt="Grand Rapids Symphonic Band" />
+          <p>A proposal-ready remodel with a clear content editing and backend deployment path.</p>
+        </div>
+        <div>
+          <h4>Proposal</h4>
+          <a href="proposal.html">Remodel Proposal</a>
+          <a href="backend.html">Backend Plan</a>
+          <a href="admin/editor.html">Content Editor</a>
+        </div>
+        <div>
+          <h4>Band Site</h4>
+          <a href="index.html">Home</a>
+          <a href="concerts.html">Concerts</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Grand Rapids Symphonic Band · Backend Proposal</span>
+        <span>Modernized website proposal · West Michigan</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "grsb-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build-static.mjs",
+    "dev": "python -m http.server 8080 --bind 127.0.0.1",
+    "start": "node server/node-server.mjs",
+    "test": "node scripts/smoke-test.mjs",
+    "test:production-backend": "node scripts/verify-production-backend.mjs"
+  }
+}

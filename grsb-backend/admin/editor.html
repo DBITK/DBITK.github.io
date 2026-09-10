@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GRSB Content Editor</title>
+  <link rel="icon" href="../assets/img/grsblogo.png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    body { background: var(--paper); }
+    .admin-shell { max-width: 1080px; margin: 0 auto; padding: 34px 22px 56px; }
+    .admin-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
+    .admin-top img { width: 74px; height: auto; }
+    .admin-grid { display: grid; grid-template-columns: 1fr; gap: 22px; }
+    .admin-card { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 22px; box-shadow: var(--shadow-sm); }
+    .editor-list { display: grid; gap: 14px; margin-top: 16px; }
+    .editor-row { border: 1px solid var(--line); border-radius: 8px; padding: 16px; background: var(--paper); }
+    .editor-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .editor-fields .wide { grid-column: 1 / -1; }
+    .editor-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .editor-row-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .admin-note { color: var(--ink-soft); font-size: .95rem; }
+    .backend-meter { display: grid; gap: 8px; margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .backend-meter strong { color: var(--navy); }
+    .status { margin-top: 12px; color: var(--navy); font-weight: 600; min-height: 1.4em; }
+    @media (max-width: 720px) {
+      .admin-top { align-items: flex-start; flex-direction: column; }
+      .editor-fields { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="admin-shell">
+    <div class="admin-top">
+      <div>
+        <p class="eyebrow">Website Admin</p>
+        <h1>Content Editor</h1>
+        <p class="admin-note">Edit the site content files, then export the updated JSON for publishing.</p>
+      </div>
+      <img src="../assets/img/grsblogo.png" alt="Grand Rapids Symphonic Band" />
+    </div>
+
+    <section class="admin-card">
+      <h2>How this editor fits</h2>
+      <p class="admin-note">This page works without a CMS login. It loads current site content, validates edits in your browser, and can save through the configured backend when an admin token is set. On static preview hosting, use the download buttons as a fallback.</p>
+      <div class="form-field" style="margin-top:18px;max-width:520px">
+        <label for="admin-token">Admin save token</label>
+        <input type="password" id="admin-token" autocomplete="current-password" placeholder="Required only for Save buttons" />
+      </div>
+      <div class="editor-actions">
+        <button class="btn btn--ghost backend-save" type="button" id="save-all" disabled>Save all changes</button>
+        <button class="btn btn--primary" type="button" id="download-all">Download all JSON</button>
+      </div>
+      <p class="admin-note" id="backend-status">Checking backend save support...</p>
+      <div class="backend-meter" id="backend-details">
+        <strong>Backend status</strong>
+        <span>Checking /api/health...</span>
+      </div>
+    </section>
+
+    <div class="admin-grid">
+      <section class="admin-card">
+        <h2>Site Settings</h2>
+        <p class="admin-note">Update homepage callouts and common links. These settings are saved in <code>content/site.json</code>.</p>
+        <div id="settings-list" class="editor-list"></div>
+        <div class="editor-actions">
+          <button class="btn btn--ghost backend-save" type="button" id="save-site" disabled>Save site settings</button>
+          <button class="btn btn--primary" type="button" id="download-site">Download site.json</button>
+        </div>
+      </section>
+
+      <section class="admin-card">
+        <h2>Concerts</h2>
+        <p class="admin-note">Dates use <code>YYYY-MM-DD</code>. The public concerts page automatically sorts upcoming and past concerts.</p>
+        <div id="concerts-list" class="editor-list"></div>
+        <div class="editor-actions">
+          <button class="btn btn--ghost" type="button" id="add-concert">Add Concert</button>
+          <button class="btn btn--ghost backend-save" type="button" id="save-concerts" disabled>Save concerts</button>
+          <button class="btn btn--primary" type="button" id="download-concerts">Download concerts.json</button>
+        </div>
+      </section>
+
+      <section class="admin-card">
+        <h2>Audio Tracks</h2>
+        <p class="admin-note">Local MP3 paths are optional. Remote URLs keep the player working while audio files are hosted elsewhere.</p>
+        <div id="tracks-list" class="editor-list"></div>
+        <div class="editor-actions">
+          <button class="btn btn--ghost" type="button" id="add-track">Add Track</button>
+          <button class="btn btn--ghost backend-save" type="button" id="save-audio" disabled>Save audio</button>
+          <button class="btn btn--primary" type="button" id="download-audio">Download audio.json</button>
+        </div>
+      </section>
+    </div>
+
+    <p class="status" id="status" role="status"></p>
+  </main>
+
+  <script src="editor.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Grand Rapids Symphonic Band emblem">
+  <rect x="4" y="4" width="92" height="92" rx="10" fill="#6f1d2e"/>
+  <path d="M16 84 L16 60 L40 84 Z" fill="#a8915f"/>
+  <path d="M62 18 C44 20 36 34 41 48 C45 60 60 62 62 74 C63 82 56 86 48 84 C55 88 68 86 70 74 C72 60 56 56 53 46 C50 36 58 26 70 26 C66 21 64 19 62 18 Z" fill="#f5efe2"/>
+  <circle cx="66" cy="20" r="4.4" fill="#f5efe2"/>
+  <circle cx="46" cy="82" r="4.4" fill="#f5efe2"/>
+</svg>

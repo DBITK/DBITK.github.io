@@ -1,0 +1,89 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+site_url: "https://grand-rapids-symphonic-band.jzgb.chatgpt.site"
+display_url: "https://grand-rapids-symphonic-band.jzgb.chatgpt.site"
+logo_url: "/assets/img/grsblogo.png"
+
+collections:
+  - name: "content"
+    label: "Website Content"
+    files:
+      - name: "concerts"
+        label: "Concerts"
+        file: "content/concerts.json"
+        format: "json"
+        fields:
+          - label: "Concerts"
+            name: "concerts"
+            widget: "list"
+            summary: "{{fields.date}} - {{fields.title}}"
+            fields:
+              - { label: "Date", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD" }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Time / Display Text", name: "time", widget: "string", hint: "Example: Sunday · 3:00 PM" }
+              - { label: "Ticket or Program Link", name: "link", widget: "string", required: false }
+              - { label: "Button Text", name: "cta", widget: "string", default: "Details" }
+      - name: "audio"
+        label: "Audio Player"
+        file: "content/audio.json"
+        format: "json"
+        fields:
+          - label: "Tracks"
+            name: "tracks"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Local MP3 Path", name: "file", widget: "string", required: false, hint: "Example: assets/audio/example.mp3" }
+              - { label: "Fallback Streaming URL", name: "remote", widget: "string", required: false }
+      - name: "site"
+        label: "Site Settings"
+        file: "content/site.json"
+        format: "json"
+        fields:
+          - label: "Homepage Announcement"
+            name: "announcement"
+            widget: "object"
+            fields:
+              - { label: "Eyebrow", name: "eyebrow", widget: "string" }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Body", name: "body", widget: "text" }
+              - { label: "Button Text", name: "buttonText", widget: "string" }
+              - { label: "Button Link", name: "buttonLink", widget: "string" }
+          - label: "Donation Callout"
+            name: "donation"
+            widget: "object"
+            fields:
+              - { label: "Eyebrow", name: "eyebrow", widget: "string" }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Body", name: "body", widget: "text" }
+              - { label: "Button Text", name: "buttonText", widget: "string" }
+              - { label: "Button Link", name: "buttonLink", widget: "string" }
+          - label: "Contact"
+            name: "contact"
+            widget: "object"
+            fields:
+              - { label: "Phone", name: "phone", widget: "string" }
+              - { label: "Primary Email", name: "email", widget: "string" }
+              - { label: "Info Email", name: "infoEmail", widget: "string" }
+              - { label: "Facebook URL", name: "facebook", widget: "string" }
+              - { label: "Mailing Address", name: "address", widget: "string" }
+          - label: "Tickets"
+            name: "tickets"
+            widget: "object"
+            fields:
+              - { label: "Ticket URL", name: "ticketUrl", widget: "string" }
+              - { label: "Voucher URL", name: "voucherUrl", widget: "string" }
+          - label: "Support"
+            name: "support"
+            widget: "object"
+            fields:
+              - { label: "Givebutter URL", name: "givebutterUrl", widget: "string" }
+              - { label: "Venmo", name: "venmo", widget: "string" }
