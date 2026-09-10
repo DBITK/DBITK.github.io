@@ -1,0 +1,39 @@
+{
+  "concerts": [
+    {
+      "date": "2025-10-19",
+      "title": "Transcendent Journey",
+      "time": "Sunday · 3:00 PM",
+      "link": "https://www.grsymphonicband.org/uploads/1/3/6/9/13697867/oct_2025.pdf",
+      "cta": "View Program"
+    },
+    {
+      "date": "2025-12-14",
+      "title": "A Very Midwest Christmas",
+      "time": "Sunday · 3:00 PM",
+      "link": "https://www.grsymphonicband.org/uploads/1/3/6/9/13697867/dec_2025.pdf",
+      "cta": "View Program"
+    },
+    {
+      "date": "2026-02-15",
+      "title": "Melodies of the Heart",
+      "time": "Sunday · 3:00 PM",
+      "link": "https://www.grsymphonicband.org/uploads/1/3/6/9/13697867/feb_program_2026.pdf",
+      "cta": "View Program"
+    },
+    {
+      "date": "2026-03-22",
+      "title": "Broadway Showstoppers",
+      "time": "Sunday · 3:00 PM",
+      "link": "https://www.grsymphonicband.org/uploads/1/3/6/9/13697867/march_2026_program.pdf",
+      "cta": "View Program"
+    },
+    {
+      "date": "2026-05-17",
+      "title": "America the Beautiful",
+      "time": "Sunday · 3:00 PM",
+      "link": "https://www.grsymphonicband.org/uploads/1/3/6/9/13697867/05_may_program.pdf",
+      "cta": "View Program"
+    }
+  ]
+}
