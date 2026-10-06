@@ -1513,6 +1513,7 @@ body.crt-off #crt { display: none; }
   }
 }
 </style>
+<link rel="stylesheet" href="museum/museum.css" />
 </head>
 <body>
 
@@ -1571,6 +1572,7 @@ body.crt-off #crt { display: none; }
         <div><span class="hint-icon">&#x1F4C1;</span> <span><strong>projects/</strong> — things I've built</span></div>
         <div><span class="hint-icon">&#x1F4C4;</span> <span><strong>skills.json</strong> — what I work with</span></div>
         <div><span class="hint-icon">&#x2709;&#xFE0F;</span> <span><strong>contact.txt</strong> — get in touch</span></div>
+        <div><span class="hint-icon">&#x1F3DB;&#xFE0F;</span> <span><strong>MUSEUM.EXE</strong> — hands-on exhibits</span></div>
       </div>
       <div class="visitor-counter" id="visitor-counter">
         <div class="vc-odometer" id="vc-odometer" aria-hidden="true"></div>
@@ -1586,7 +1588,11 @@ body.crt-off #crt { display: none; }
   <div class="desktop-icons">
     <div class="desktop-icon" id="icon-about" ondblclick="iconOpen('about')" onclick="selectIcon(this)">
       <div class="icon-graphic">&#x1F464;</div>
-      <div class="icon-label">about.exe</div>
+      <div class="icon-label">About</div>
+    </div>
+    <div class="desktop-icon" id="icon-museum" ondblclick="iconOpen('museum')" onclick="selectIcon(this)">
+      <div class="icon-graphic">&#x1F3DB;&#xFE0F;</div>
+      <div class="icon-label">MUSEUM.EXE</div>
     </div>
     <div class="desktop-icon" id="icon-projects" ondblclick="iconOpen('projects')" onclick="selectIcon(this)">
       <div class="icon-graphic">&#x1F4C1;</div>
@@ -1610,7 +1616,7 @@ body.crt-off #crt { display: none; }
   <div class="win98-window" id="win-about">
     <div class="win-titlebar" id="tb-about">
       <span class="win-icon-small">&#x1F464;</span>
-      <span class="win-title">about.exe</span>
+      <span class="win-title">About</span>
       <div class="win-controls">
         <div class="win-btn win-minimize" onclick="minimizeWindow('about')" title="Minimize">&#x2014;</div>
         <div class="win-btn win-maximize" onclick="toggleMaximize('about')" title="Maximize"></div>
@@ -1646,8 +1652,8 @@ body.crt-off #crt { display: none; }
 
           <div class="about-section-head">Now</div>
           <div class="about-status-box">
-            <div class="about-status-row">DevOps Engineer @ Revenue Solutions, Inc. — remote</div>
-            <div class="about-status-row">~70 environments across 7 client implementations</div>
+            <div class="about-status-row">Senior Associate SRE @ Revenue Solutions Inc. — remote</div>
+            <div class="about-status-row">70+ environments across 12 client implementations</div>
             <div class="about-status-row">HashiCorp Terraform Associate in progress (2026)</div>
             <div class="about-status-row">Building Golden Path — statistical canary analysis pipeline</div>
           </div>
@@ -1838,6 +1844,22 @@ hand-rolled HTML, no trackers</div>
     </div>
   </div>
 
+  <!-- WINDOW: MUSEUM (engine and content in museum/) -->
+  <div class="win98-window" id="win-museum">
+    <div class="win-titlebar" id="tb-museum">
+      <span class="win-icon-small">&#x1F3DB;&#xFE0F;</span>
+      <span class="win-title">MUSEUM.EXE — Derek's Museum of Technology</span>
+      <div class="win-controls">
+        <div class="win-btn win-minimize" onclick="minimizeWindow('museum')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-maximize" onclick="toggleMaximize('museum')" title="Maximize"></div>
+        <div class="win-btn win-close" onclick="closeWindow('museum')" title="Close">&#x2715;</div>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="win-body-inner" id="museum-host"></div>
+    </div>
+  </div>
+
   <!-- WINDOW: HACKMAN -->
   <div class="win98-window" id="win-hackman">
     <div class="win-titlebar" id="tb-hackman">
@@ -1896,8 +1918,9 @@ hand-rolled HTML, no trackers</div>
 
 <!-- CONTEXT MENU -->
 <div id="ctx-menu">
-  <div class="ctx-item" onclick="ctxAction('about')">Open about.exe</div>
+  <div class="ctx-item" onclick="ctxAction('about')">Open About</div>
   <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxAction('museum')">MUSEUM.EXE</div>
   <div class="ctx-item" onclick="ctxAction('projects')">Projects/</div>
   <div class="ctx-item" onclick="ctxAction('skills')">skills.json</div>
   <div class="ctx-item" onclick="ctxAction('contact')">contact.txt</div>
@@ -1915,7 +1938,8 @@ hand-rolled HTML, no trackers</div>
     <div class="sm-item" id="sm-programs-wrap">
       <span>&#x1F4C1;</span> Programs <span class="sm-arrow">&#x25BA;</span>
       <div id="sm-programs-sub">
-        <div class="ctx-item" onclick="smAction('about')">&#x1F464; about.exe</div>
+        <div class="ctx-item" onclick="smAction('about')">&#x1F464; About</div>
+        <div class="ctx-item" onclick="smAction('museum')">&#x1F3DB;&#xFE0F; MUSEUM.EXE</div>
         <div class="ctx-item" onclick="smAction('projects')">&#x1F4C1; projects/</div>
         <div class="ctx-item" onclick="smAction('skills')">&#x1F4C4; skills.json</div>
         <div class="ctx-item" onclick="smAction('contact')">&#x2709;&#xFE0F; contact.txt</div>
@@ -1947,66 +1971,64 @@ hand-rolled HTML, no trackers</div>
 <!-- RESUME (print only) -->
 <div id="resume-print">
   <h1>Derek Bartlett</h1>
-  <div class="r-contact">Platform &amp; DevOps Engineer &nbsp;|&nbsp; Grand Rapids, MI (remote) &nbsp;|&nbsp; derek@derekbartlett.com &nbsp;|&nbsp; github.com/DBITK &nbsp;|&nbsp; linkedin.com/in/DBIT &nbsp;|&nbsp; derekbartlett.com</div>
+  <div class="r-contact">Senior SRE / DevOps / Platform Engineer &nbsp;|&nbsp; Grand Rapids, MI (remote) &nbsp;|&nbsp; derek@derekbartlett.com &nbsp;|&nbsp; linkedin.com/in/DBIT &nbsp;|&nbsp; github.com/DBITK &nbsp;|&nbsp; derekbartlett.com</div>
 
   <h2>Summary</h2>
-  <p>Platform and DevOps engineer building multi-environment delivery systems, progressive delivery pipelines, and the tooling that lets developers self-serve. The right fit is somewhere I can build the paved path rather than just walk it. Open to new roles.</p>
+  <p>SRE, DevOps, and platform engineering professional with 7+ years in enterprise systems and 5+ years supporting multi-client production and non-production infrastructure. Owns release pipelines, environment configuration, production troubleshooting, automation, monitoring, and cross-functional technical coordination across 12 client implementations and 70+ configured environments. Known as a go-to technical partner for complex deployments and production releases, and for clear communication with developers, infrastructure teams, project leads, and clients.</p>
 
   <h2>Experience</h2>
 
-  <h3>DevOps Engineer — Revenue Solutions, Inc.</h3>
-  <div class="r-meta">Feb 2021 – Present</div>
-  <p>Building and maintaining multi-environment delivery infrastructure for enterprise tax and revenue applications serving government agencies. Each client implementation spans five to six individually configured tiers with full lifecycle ownership.</p>
+  <h3>Engineer Senior Associate, Site Reliability Engineering — Revenue Solutions Inc.</h3>
+  <div class="r-meta">Remote &nbsp;|&nbsp; Feb 2021 – Present</div>
   <ul>
-    <li>Design and maintain Azure DevOps release pipelines executing daily deployments across 70+ client environments</li>
-    <li>Support 10–15 developers with environment-specific configuration and self-service tooling</li>
-    <li>Built PowerShell GUI deployment utilities replacing manual multi-server workflows</li>
-    <li>Customized Azure DevOps process templates, work-item types, and approval gates</li>
-    <li>Provisioned and configured new client environments through standardized cloning</li>
-    <li>Managed infrastructure patching, application configuration, and server maintenance across on-prem and cloud-hosted environments</li>
+    <li>Support 12 client implementations and 70+ individually configured production and non-production environments across Dev, Test, MOD, Preprod, and Production tiers.</li>
+    <li>Configure and maintain Azure DevOps release pipelines for daily .NET, Java, SQL, SSIS, and SSRS deployments, including environment-specific configuration and approval gates.</li>
+    <li>Built a PowerShell deployment utility that automated a manual hotfix process across servers, adding dry-run validation and server reachability checks before deployment.</li>
+    <li>Created developer self-service tooling that removed manual ticket-based steps for routine environment actions and reduced dependency on SRE intervention.</li>
+    <li>Deployed heartbeat services across projects to log service and uptime records, establishing a foundation for proactive monitoring and notification.</li>
+    <li>Established performance baselines and built the case for storage expansion on undersized OS disks, reducing production stability and service-down risk.</li>
+    <li>Served as primary technical support and informal technical lead for a major county client, coordinating with customer teams and supporting multiple production releases and go-lives.</li>
+    <li>Triaged application-platform upgrades (RPE 2024 LTS, WildFly 41), infrastructure migration resets, connectivity issues, and production system parameter fixes.</li>
+    <li>Remediated JAMS operational and security issues, including job failures, licensing, agent reinstalls, and vulnerability patching for a critical Web/Thin Client exposure; coordinated backup, installer, and validation steps with client DBA and infrastructure teams.</li>
+    <li>Mentor SRE peers through live deployment screen shares, troubleshooting walkthroughs, and documentation that lets others complete deployment steps independently.</li>
+    <li>Communicate technical status, risks, and resolution paths to developers, project leads, infrastructure teams, and client stakeholders during outages and release windows.</li>
   </ul>
 
   <h3>Systems Engineer II — D9 Technologies</h3>
-  <div class="r-meta">May 2020 – Jan 2021</div>
+  <div class="r-meta">Englewood, OH &nbsp;|&nbsp; May 2020 – Jan 2021</div>
   <ul>
-    <li>Provisioned and maintained customer environments using Windows Server, VMware, and Hyper-V</li>
-    <li>Conducted security monitoring via Sophos and managed patching cycles across client infrastructure</li>
+    <li>Provisioned and maintained customer environments using Windows Server, VMware, and Hyper-V, supporting implementation, patching, and infrastructure quality standards.</li>
+    <li>Conducted security monitoring through Sophos, coordinated patching cycles, and documented support actions for customer infrastructure.</li>
+  </ul>
+
+  <h2>Selected Impact</h2>
+  <ul>
+    <li>Recognized in manager and peer feedback as a strong SRE, go-to technical resource, and reliable partner across multiple state and local government client projects.</li>
+    <li>Balanced support for 4+ projects while responding to production outages, hotfix integrations, daily configuration requests, and client-facing technical issues.</li>
+    <li>Supported enterprise migration and modernization efforts, including an Azure Government Cloud migration and a major platform upgrade.</li>
+    <li>Helped stabilize teams during transition by onboarding new employees and guiding teammates through high-pressure production activities.</li>
   </ul>
 
   <h2>Projects</h2>
-
   <h3>Golden Path <span style="font-weight:normal;font-size:10pt;">(derekbartlett.com/golden-path-pipeline)</span></h3>
   <p>A deployment pipeline that decides statistically whether a build is allowed to reach production. Each environment deploys a fresh baseline alongside the candidate, drives identical load through both, and judges the result with a Mann-Whitney U test and effect-size gate before performing a red/black traffic switch. Compiles to Argo Rollouts manifests.</p>
-
   <h3>Self-hosted Homelab</h3>
-  <p>Single-server Proxmox host with RAID 1 storage. TrueNAS, Jellyfin, Sonarr stack, Home Assistant, Pi-hole. Treated personal kit like prod — segmentation, snapshots, and recovery drills.</p>
+  <p>Single-server Proxmox host with RAID 1 storage: TrueNAS, Jellyfin, Home Assistant, Pi-hole. Run like prod, with segmentation, snapshots, and recovery drills.</p>
 
-  <h3>LoRaWAN IoT Network — CMU DISCR Lab</h3>
-  <p>Designed and deployed end-to-end LoRaWAN infrastructure alongside peer institutions. Database, MQTT broker, Grafana dashboards, containerized services.</p>
-
-  <h3>Multi-environment Delivery Platform — RSI</h3>
-  <p>Azure DevOps release pipelines running daily .NET, Java, SQL, SSRS, and SSIS deployments across 70+ individually configured environments for 12 government client implementations.</p>
-
-  <h2>Skills</h2>
+  <h2>Technical Skills</h2>
   <div class="r-skills-grid">
-    <div><strong>CI/CD:</strong> Azure DevOps, GitHub Actions, JAMS</div>
-    <div><strong>Release:</strong> Pipelines, Boards, SDLC process design</div>
-    <div><strong>Progressive Delivery:</strong> canary analysis, red/black, Argo Rollouts, Mann-Whitney U</div>
-    <div><strong>Cloud:</strong> Azure, AWS</div>
-    <div><strong>IaC:</strong> Terraform (Associate in progress)</div>
-    <div><strong>OS:</strong> Windows Server 2016–2022, Debian, Ubuntu, Alpine</div>
-    <div><strong>Virtualization:</strong> VMware ESXi/vSphere, Hyper-V, Proxmox</div>
-    <div><strong>Services:</strong> AD, DNS, DHCP, IIS</div>
-    <div><strong>Languages:</strong> PowerShell, Python, SQL; exposure to JavaScript, React, HTML/CSS</div>
-    <div><strong>Monitoring:</strong> Grafana, Kibana</div>
-    <div><strong>Data:</strong> SQL Server, SSRS, SSIS</div>
-    <div><strong>Tools:</strong> Git, ServiceNow, OpenText Content Server</div>
+    <div><strong>Release &amp; DevOps:</strong> Azure DevOps Pipelines, Repos, Boards, approval gates, release management, GitHub Actions</div>
+    <div><strong>Automation:</strong> PowerShell, GUI deployment tools, hotfix automation, environment reset utilities, self-service workflows</div>
+    <div><strong>Infrastructure:</strong> Windows Server, IIS, Active Directory, DNS, DHCP, VMware ESXi/vSphere, Hyper-V, Azure</div>
+    <div><strong>Application Platforms:</strong> Java, WildFly/JBoss, RPE, EngageOne, OpenText, OnBase</div>
+    <div><strong>Data &amp; Reporting:</strong> SQL Server, SQL scripting, SSIS, SSRS, log analysis, Grafana, Kibana</div>
+    <div><strong>Operations:</strong> Incident triage, production support, JAMS, SSL certificates, vulnerability remediation, monitoring</div>
   </div>
 
   <h2>Education</h2>
   <h3>B.S., Information Technology — Central Michigan University</h3>
   <div class="r-meta">Aug 2019 &nbsp;|&nbsp; Specialization: Systems Administration and Networking &nbsp;|&nbsp; Dean's List</div>
-  <p>Research: DISCR Lab, LoRaWAN IoT network infrastructure</p>
+  <p>Research: designed and deployed LoRaWAN IoT network infrastructure (databases, MQTT brokers, Grafana, containerization) at the DISCR Lab alongside peer institutions.</p>
 </div>
 
 <!-- TASKBAR -->
@@ -2549,8 +2571,10 @@ function dismissWelcome() {
     dlg.style.display = 'none';
     // Check hash for deep link, otherwise open about
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    const validIds = ['about', 'projects', 'skills', 'contact'];
-    if (hash && validIds.includes(hash)) {
+    const validIds = ['about', 'projects', 'skills', 'contact', 'museum'];
+    if (window.MUSEUM_TOUR) {
+      openWindow('museum');
+    } else if (hash && validIds.includes(hash)) {
       openWindow(hash);
     } else {
       openWindow('about');
@@ -2564,11 +2588,12 @@ function dismissWelcome() {
 let zCounter = 20;
 const openWindows = {};   // id → { minimized: bool, title, icon }
 const windowMeta = {
-  about:    { title: 'about.exe',              icon: '👤' },
+  about:    { title: 'About',                  icon: '👤' },
   projects: { title: 'projects/ — Explorer',   icon: '📁' },
   skills:   { title: 'skills.json',            icon: '📄' },
   contact:  { title: 'contact.txt — Notepad',  icon: '✉' },
   hackman:  { title: '??? — Unknown Program',  icon: '❓' },
+  museum:   { title: 'MUSEUM.EXE',             icon: '🏛' },
 };
 
 /* =============================================================
@@ -2583,6 +2608,7 @@ const windowDefaults = {
   skills:   { w: 500, h: 460, x: 140, y: 70 },
   contact:  { w: 380, h: 300, x: 150, y: 90 },
   hackman:  { w: 420, h: 380, x: 130, y: 50 },
+  museum:   { w: 880, h: 530, x: 130, y: 24 },
 };
 let uiScale = 1;
 
@@ -2694,7 +2720,7 @@ updateUiScale();
 
 /* iconOpen: called from desktop icon double-click; sets URL hash */
 function iconOpen(id) {
-  const linkable = ['about', 'projects', 'skills', 'contact'];
+  const linkable = ['about', 'projects', 'skills', 'contact', 'museum'];
   if (linkable.includes(id)) {
     history.replaceState(null, '', '#' + id);
   }
@@ -2719,6 +2745,8 @@ function openWindow(id) {
     openWindows[id].minimized = false;
     updateTaskbarTab(id, false);
   }
+
+  if (id === 'museum' && window.museumOnOpen) window.museumOnOpen();
 
   // hackman title screen click handler
   if (id === 'hackman' && !hackmanInited) {
@@ -3493,5 +3521,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 </script>
+<script src="museum/exhibits.js"></script>
+<script src="museum/museum.js"></script>
 </body>
 </html>

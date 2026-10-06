@@ -28,7 +28,9 @@ under `grsb/`, plus the Node backend that edits it.
 
 | Path | What it is |
 |---|---|
-| `index.html` | The whole portfolio: a Windows 98-style "Derek OS" desktop (~2,700 lines) |
+| `index.html` | The portfolio's Windows 98-style "Derek OS" desktop |
+| `museum/` | MUSEUM.EXE, the point-and-click museum: `museum.js` (engine), `exhibits.js` (content and room layouts), `museum.css`, `rooms/` (art) |
+| `docs/MUSEUM.md` | The museum's design: what an exhibit is, rooms, tour links, roadmap (not served by Pages) |
 | `photo.jpg` | Avatar in the welcome dialog and the `og:image` |
 | `CNAME` | Custom domain for Pages |
 | `_config.yml` | Only excludes `CLAUDE.md` and `counter-worker/` from the published site |
@@ -66,7 +68,8 @@ is double-clicked. Hackman is deliberately not linkable.
 
 | id | Title | Contents |
 |---|---|---|
-| `about` | about.exe | Profile dialog |
+| `about` | About | Profile dialog |
+| `museum` | MUSEUM.EXE | The museum (see below and `docs/MUSEUM.md`) |
 | `projects` | projects/ — Windows Explorer | Explorer list; each `.explorer-row` is a project (name, blurb, fake size and date) |
 | `skills` | skills.json — [Read Only] | Terminal-style `cat skills.json` with syntax-colored spans (`t-key`, `t-val`, `t-comment`) |
 | `contact` | contact.txt — Notepad | Contact links |
@@ -109,7 +112,7 @@ be deep-linkable, also add it to the `linkable` list in `iconOpen()` and to `val
 ### Desktop chrome
 
 - **Desktop icons** (`.desktop-icons`): single-click selects (`selectIcon`), double-click
-  opens. They are about.exe, projects/, skills.json, contact.txt and ??? (Hackman).
+  opens. They are About, MUSEUM.EXE, projects/, skills.json, contact.txt and ??? (Hackman).
 - **Taskbar** (`#taskbar`): Start button, a tab per open window (`addTaskbarTab` and
   related functions), and a tray date/clock (`updateClock`).
 - **Start menu** (`#start-menu`, sidebar "Derek OS"): Programs ▶ submenu, Print Resume,
@@ -196,9 +199,27 @@ The bio, title and contact details are repeated in several places. Update them t
 - the welcome dialog text (JS `showWelcome`) and its title bar
 - the `about`, `skills`, `projects` and `contact` windows
 - `#mobile-fallback`
-- `#resume-print`
+- `#resume-print`: rebuilt from Derek's master résumé, minus his phone number and his
+  employer's client names. The museum's Front Office shows a clone of it.
 
 Contacts in use: `derek@derekbartlett.com`, `github.com/DBITK`, `linkedin.com/in/DBIT`.
+
+## Museum (`museum/`)
+
+A 90s CD-ROM-style museum inside the MUSEUM.EXE window; the design is in `docs/MUSEUM.md`.
+- **Engine:** `museum.js` draws an 860×480 stage scaled to the window, runs the
+  hotspots, docent, panels and splash, reads tour links, and holds the staged Canary
+  Lab simulation (seeded data plus a real Mann-Whitney U and Cliff's delta judge).
+- **Content:** `exhibits.js` holds each exhibit's placard, evidence and ELI5 text, and
+  each room's art and hotspot boxes. Add or move hotspots there, not in the engine.
+- **Tour links:** `#tour=<base64url JSON {to, note, ex}>`. Build one with
+  `museumTourLink({...})` in the console. A tour opens the museum after the welcome
+  dialog, lights only the listed exhibits, and the docent shows the note (plain text,
+  600 characters max).
+- **Nothing live:** the museum makes no AI calls or other network requests beyond its
+  own files.
+- **Not in the repo:** the full-size room renders stay in `museum/rooms/originals/`
+  (git-ignored); only the web copies are committed.
 
 ## GRSB site (`grsb/` + `grsb-backend/`)
 

@@ -2,4 +2,5 @@
 # keeps repo docs and the counter Worker source off the live site.
 exclude:
   - CLAUDE.md
+  - docs
   - counter-worker
