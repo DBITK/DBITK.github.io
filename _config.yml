@@ -1,4 +1,5 @@
 # GitHub Pages (Jekyll) settings. The portfolio has no build step; this only
-# keeps repo docs off the live site.
+# keeps repo docs and the counter Worker source off the live site.
 exclude:
   - CLAUDE.md
+  - counter-worker

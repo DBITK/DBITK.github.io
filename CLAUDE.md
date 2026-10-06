@@ -31,7 +31,8 @@ under `grsb/`, plus the Node backend that edits it.
 | `index.html` | The whole portfolio: a Windows 98-style "Derek OS" desktop (~2,700 lines) |
 | `photo.jpg` | Avatar in the welcome dialog and the `og:image` |
 | `CNAME` | Custom domain for Pages |
-| `_config.yml` | Only excludes `CLAUDE.md` from the published site |
+| `_config.yml` | Only excludes `CLAUDE.md` and `counter-worker/` from the published site |
+| `counter-worker/` | Cloudflare Worker behind the visitor counter (not served by Pages) |
 | `grsb/` | **Published** GRSB static site → `derekbartlett.com/grsb/` (not linked from the portfolio) |
 | `grsb-backend/` | Source and Node server for the GRSB site and its content editor, deployed to Render |
 | `render.yaml` | Render blueprint for `grsb-backend` |
@@ -136,6 +137,19 @@ be deep-linkable, also add it to the `linkable` list in `iconOpen()` and to `val
   - Toggle it from Start → CRT Effect (`toggleCrt()`). The choice is stored in
     `localStorage['crt']` and applied as `body.crt-off`.
   - It's hidden on mobile; reduced motion drops the flash and the roll.
+- **Visitor counter** (`VISITOR COUNTER` JS section + `counter-worker/`):
+  - A retro odometer in the welcome dialog ("You are the 50th visitor!!!") and a mini
+    copy in the taskbar tray (`#tray-visitors`).
+  - It's fed by a Cloudflare Worker with one Durable Object holding one number.
+    `POST /count` adds one, but only for derekbartlett.com origins; `GET` just reads.
+    Localhost may read but never adds. There are no cookies, IPs or visitor data.
+  - `COUNTER_URL` in `index.html` points at the deployed Worker. If it's empty or
+    unreachable, the counter stays hidden.
+  - A browser counts once per tab (`sessionStorage['visitorNumber']`, which also keeps
+    "your" number on refresh). `?nocount` opts a browser out permanently
+    (`localStorage['visitorCounterSkip']`).
+  - Deploy steps are in `counter-worker/README.md`. The folder is excluded from Pages
+    in `_config.yml`.
 - **Desktop watermark** (`#desktop-label`): name and domain behind the icons and windows.
 - **Visual details:** custom SVG cursors (default plus a red "clickable" variant, at the
   top of the CSS), chunky always-visible Win98 scrollbars, and `user-select: none`
@@ -156,7 +170,20 @@ A Pac-Man clone ("eat the bytes before the antivirus finds you") on `#hackman-ca
   pellets.
 - **Controls:** arrows or WASD; Enter or a click on the title screen starts the game.
 - **HUD:** score, lives and level, with Web Audio beeps (`playBeep`, `playDeath`).
-- **Speeds:** `PLAYER_MS_BASE` and `GHOST_MS_BASE`.
+- **Speeds:** `PLAYER_MS_BASE` and `GHOST_MS_BASE`, faster each level. The power-up
+  (`POWER_MS`), the mouth and the pellet pulse are time-based, not per frame.
+- **Spawns:** `PLAYER_SPAWN`, `GHOST_SPAWNS` (inside the ghost house) and `GHOST_HOME`
+  (where eaten ghosts go) all pass through `nearestOpen()`, so nothing can start in a
+  wall even if `MAZE_TEMPLATE` changes. After a death, `resetPositions()` puts everyone
+  back.
+- **Movement:** columns wrap (`wrapCol`), which makes row 10 a side tunnel. A collision
+  also counts when the player and a ghost swap tiles in one step.
+- **Levels:** `hackmanInit()` starts a new game (score, lives); `hackmanResetBoard()`
+  gives a fresh maze but keeps score, lives and level.
+- **Win and lose:** eating every dot calls `hackmanWin()`: the maze flashes, a jingle
+  plays, then the "ACCESS GRANTED" screen shows Next Level and Play Again. Losing shows
+  "VIRUS DETECTED" with Reboot. Both screens show the best score, kept in
+  `localStorage['hackmanBest']`, and Enter picks the main action.
 - **Lifecycle:** closing the window calls `hackmanStop()`; the title listeners are
   attached on first open.
 - **Sizing:** `fitHackmanCanvas()` (run by a ResizeObserver) scales the canvas's

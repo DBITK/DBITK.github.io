@@ -289,6 +289,57 @@ html, body {
   line-height: 1.7;
 }
 .welcome-hint div { display: flex; align-items: baseline; gap: 6px; }
+
+/* Visitor counter — a retro hit-counter odometer */
+.visitor-counter {
+  display: none;
+  margin: 0 12px 10px;
+  text-align: center;
+}
+.visitor-counter.show { display: block; }
+.vc-odometer {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: #000;
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+.vc-digit {
+  display: inline-block;
+  width: 14px;
+  height: 20px;
+  overflow: hidden;
+  background: linear-gradient(#2a2a2a, #000 45%, #000 55%, #2a2a2a);
+  font: bold 15px/20px "Courier New", monospace;
+  color: #3dff3d;
+  text-shadow: 0 0 4px rgba(61, 255, 61, 0.6);
+  text-align: center;
+}
+.vc-strip {
+  display: flex;
+  flex-direction: column;
+  transition: transform 1.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.vc-strip span { height: 20px; }
+.vc-caption {
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000080;
+}
+.vc-caption .vc-star { color: #c4202c; }
+/* Compact copy in the taskbar tray */
+#tray-visitors { display: none; border-right: 1px solid #808080; padding-right: 6px; margin-right: 2px; }
+#tray-visitors.show { display: inline-flex; align-items: center; }
+#tray-visitors .vc-odometer { padding: 1px; border-width: 1px; gap: 1px; }
+#tray-visitors .vc-digit { width: 8px; height: 13px; font-size: 10px; line-height: 13px; }
+#tray-visitors .vc-strip span { height: 13px; }
+@media (prefers-reduced-motion: reduce) {
+  .vc-strip { transition: none; }
+}
 .welcome-hint .hint-icon { color: #000080; font-size: 13px; }
 .welcome-footer {
   display: flex;
@@ -860,7 +911,17 @@ html, body {
   color: #aaa;
   margin-bottom: 16px;
 }
-#hackman-overlay-btn {
+#hackman-overlay-stats {
+  font-size: 12px;
+  color: #00ff44;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  white-space: pre;
+}
+.hackman-overlay-btns { display: flex; gap: 10px; }
+#hackman-overlay-next { display: none; }
+#hackman-overlay-next.show { display: inline-block; }
+#hackman-overlay button {
   background: #004400;
   color: #00ff44;
   border: 2px solid #00ff44;
@@ -1511,6 +1572,10 @@ body.crt-off #crt { display: none; }
         <div><span class="hint-icon">&#x1F4C4;</span> <span><strong>skills.json</strong> — what I work with</span></div>
         <div><span class="hint-icon">&#x2709;&#xFE0F;</span> <span><strong>contact.txt</strong> — get in touch</span></div>
       </div>
+      <div class="visitor-counter" id="visitor-counter">
+        <div class="vc-odometer" id="vc-odometer" aria-hidden="true"></div>
+        <div class="vc-caption" id="vc-caption"></div>
+      </div>
       <div class="welcome-footer">
         <button class="welcome-btn primary" id="welcome-ok" onclick="dismissWelcome()" style="display:none;">Let's go &rarr;</button>
       </div>
@@ -1804,7 +1869,11 @@ hand-rolled HTML, no trackers</div>
           <div id="hackman-overlay">
             <div id="hackman-overlay-msg"></div>
             <div id="hackman-overlay-sub"></div>
-            <button id="hackman-overlay-btn" onclick="hackmanRestart()">REBOOT SYSTEM</button>
+            <div id="hackman-overlay-stats"></div>
+            <div class="hackman-overlay-btns">
+              <button id="hackman-overlay-next" onclick="hackmanNextLevel()">NEXT LEVEL &#x25B6;</button>
+              <button id="hackman-overlay-btn" onclick="hackmanRestart()">REBOOT SYSTEM</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1951,6 +2020,7 @@ hand-rolled HTML, no trackers</div>
   <div class="taskbar-sep"></div>
   <div class="taskbar-tabs" id="taskbar-tabs"></div>
   <div class="system-tray">
+    <span id="tray-visitors" title="Visitors"></span>
     <span id="tray-date"></span>
     <span id="tray-clock">00:00</span>
   </div>
@@ -2363,6 +2433,82 @@ function createPipes(canvas, opts) {
 })();
 
 /* =============================================================
+   VISITOR COUNTER — retro odometer fed by counter-worker/ (a
+   Cloudflare Worker holding one number). Counts once per browser
+   tab; local previews and opted-out browsers only read. Stays
+   hidden if the counter can't be reached.
+   ============================================================= */
+const COUNTER_URL = 'https://derekbartlett-visitor-counter.derekbartlett.workers.dev/count';   // counter-worker/
+
+const visitorCount = (function() {
+  if (!COUNTER_URL || window.__mobileMode) return Promise.resolve(null);
+  const store = (area, k, v) => { try { return v === undefined ? area.getItem(k) : area.setItem(k, v); } catch (_) { return null; } };
+  if (new URLSearchParams(location.search).has('nocount')) store(localStorage, 'visitorCounterSkip', '1');
+
+  const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  const mine = store(sessionStorage, 'visitorNumber');      // this tab already counted
+  const readOnly = isLocal || mine || store(localStorage, 'visitorCounterSkip') === '1';
+
+  return fetch(COUNTER_URL, { method: readOnly ? 'GET' : 'POST', cache: 'no-store',
+                              signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined })
+    .then(r => (r.ok ? r.json() : null))
+    .then(d => {
+      if (!d || !Number.isFinite(d.count)) return null;
+      if (!readOnly) store(sessionStorage, 'visitorNumber', String(d.count));
+      // A counted visitor keeps their own number on refresh; others see the total
+      return { total: d.count, mine: readOnly ? (mine ? Number(mine) : null) : d.count };
+    })
+    .catch(() => null);
+})();
+
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+  return n.toLocaleString('en-US') + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+/* Fill `el` with rolling digit wheels that spin up to `n` */
+function buildOdometer(el, n) {
+  const digits = String(n).padStart(6, '0');
+  el.innerHTML = '';
+  const strips = [...digits].map(() => {
+    const cell = document.createElement('span');
+    cell.className = 'vc-digit';
+    const strip = document.createElement('span');
+    strip.className = 'vc-strip';
+    strip.innerHTML = '<span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>' +
+                      '<span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>';
+    cell.appendChild(strip);
+    el.appendChild(cell);
+    return strip;
+  });
+  // Next frame, so the wheels start at 0 and roll; leftmost settles last
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    strips.forEach((strip, i) => {
+      strip.style.transitionDelay = ((digits.length - 1 - i) * 0.12) + 's';
+      strip.style.transform = 'translateY(' + (-Number(digits[i]) * 10) + '%)';
+    });
+  }));
+}
+
+function showVisitorCounter() {
+  visitorCount.then(v => {
+    if (!v) return;
+    const n = v.mine || v.total;
+    buildOdometer(document.getElementById('vc-odometer'), n);
+    document.getElementById('vc-caption').innerHTML = v.mine
+      ? '<span class="vc-star">&#9733;</span> You are the ' + ordinal(v.mine) + ' visitor!!! <span class="vc-star">&#9733;</span>'
+      : 'Visitors so far: ' + v.total.toLocaleString('en-US');
+    document.getElementById('visitor-counter').classList.add('show');
+
+    const tray = document.getElementById('tray-visitors');
+    tray.innerHTML = '<span class="vc-odometer"></span>';
+    buildOdometer(tray.firstChild, v.total);
+    tray.title = v.total.toLocaleString('en-US') + ' visitors';
+    tray.classList.add('show');
+  });
+}
+
+/* =============================================================
    WELCOME DIALOG
    ============================================================= */
 function showWelcome() {
@@ -2387,6 +2533,7 @@ function showWelcome() {
       setTimeout(() => {
         document.getElementById('welcome-hint').style.display = 'block';
         document.getElementById('welcome-ok').style.display  = 'block';
+        showVisitorCounter();
       }, 200);
     }
   }
@@ -2966,30 +3113,76 @@ const MAZE_TEMPLATE = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
-let maze, player, ghosts, score, lives, level, totalDots, dotsEaten, powered, powerTimer, gameOver, gameWon;
+/* Nearest open tile to (row, col), searching outward ring by ring. Spawns go
+   through this so nothing can start inside a wall, even if the maze changes. */
+function nearestOpen(row, col) {
+  for (let d = 0; d < Math.max(ROWS, COLS); d++) {
+    for (let dr = -d; dr <= d; dr++) {
+      for (let dc = -d; dc <= d; dc++) {
+        if (Math.max(Math.abs(dr), Math.abs(dc)) !== d) continue;
+        const r = row + dr, c = col + dc;
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS && MAZE_TEMPLATE[r][c] !== 1) return { row: r, col: c };
+      }
+    }
+  }
+  return { row: 1, col: 1 };
+}
+const PLAYER_SPAWN = nearestOpen(12, 9);                       // just below the ghost house
+const GHOST_SPAWNS = [nearestOpen(10, 8), nearestOpen(10, 10)]; // inside the ghost house
+const GHOST_HOME   = nearestOpen(10, 9);                        // where eaten ghosts respawn
+const POWER_MS = 3000;
 
+let maze, player, ghosts, score, lives, level, totalDots, dotsEaten, powered, powerUntil, gameOver, gameWon;
+let hmNow = 0;   // latest frame timestamp, for time-based animation
+
+/* New game: fresh score and lives, then a fresh board */
 function hackmanInit() {
+  score = 0;
+  lives = 3;
+  hackmanResetBoard();
+}
+
+/* Fresh maze and starting positions; keeps score, lives and level */
+function hackmanResetBoard() {
   maze = MAZE_TEMPLATE.map(row => row.slice());
   totalDots = 0;
   dotsEaten = 0;
   maze.forEach(row => row.forEach(c => { if (c === 0 || c === 3) totalDots++; }));
 
-  player = { col: 9, row: 12, dx: 0, dy: 0, nextDx: 0, nextDy: 0, mouth: 0, mouthDir: 1, moveTimer: 0 };
+  player = { col: PLAYER_SPAWN.col, row: PLAYER_SPAWN.row, dx: 0, dy: 0, nextDx: 0, nextDy: 0, mouth: 0, moveTimer: 0 };
   ghosts = [
-    { col: 8, row: 9, dx: 1, dy: 0, color: '#ff4444', scatter: false, moveTimer: 0, scatterTimer: 0 },
-    { col: 10, row: 9, dx: -1, dy: 0, color: '#ff44ff', scatter: false, moveTimer: 0, scatterTimer: 0 },
+    { col: GHOST_SPAWNS[0].col, row: GHOST_SPAWNS[0].row, dx: 1,  dy: 0, color: '#ff4444', moveTimer: 0 },
+    { col: GHOST_SPAWNS[1].col, row: GHOST_SPAWNS[1].row, dx: -1, dy: 0, color: '#ff44ff', moveTimer: 0 },
   ];
-  score = 0;
-  lives = 3;
+  resetPositions();
   powered = false;
-  powerTimer = 0;
+  powerUntil = 0;
   gameOver = false;
   gameWon = false;
 
-  document.getElementById('hm-score').textContent = '0';
-  document.getElementById('hm-lives').textContent = '3';
+  document.getElementById('hm-score').textContent = score;
+  document.getElementById('hm-lives').textContent = lives;
   document.getElementById('hm-level').textContent = level || 1;
   document.getElementById('hackman-overlay').classList.remove('show');
+}
+
+/* Put the player and ghosts back on their spawn tiles (start of level, or after a death) */
+function resetPositions() {
+  Object.assign(player, { col: PLAYER_SPAWN.col, row: PLAYER_SPAWN.row, dx: 0, dy: 0, nextDx: 0, nextDy: 0 });
+  player.prevRow = player.row; player.prevCol = player.col;
+  ghosts.forEach((g, i) => {
+    g.row = GHOST_SPAWNS[i].row; g.col = GHOST_SPAWNS[i].col;
+    g.prevRow = g.row; g.prevCol = g.col;
+  });
+}
+
+function hackmanNextLevel() {
+  document.getElementById('hackman-overlay').classList.remove('show');
+  hackmanStop();
+  level++;
+  hackmanResetBoard();
+  hackmanRunning = true;
+  hackmanLoop();
 }
 
 function hackmanStartGame() {
@@ -3044,6 +3237,8 @@ function hackmanLoop(timestamp) {
   if (!hackmanRunning) return;
   hackmanRAF = requestAnimationFrame(hackmanLoop);
   frameCount++;
+  if (timestamp === undefined) return;   // first call is direct, not from rAF
+  hmNow = timestamp;
 
   const PLAYER_MS = Math.max(66, PLAYER_MS_BASE - (level - 1) * 16);
   const GHOST_MS  = Math.max(100, GHOST_MS_BASE  - (level - 1) * 16);
@@ -3060,12 +3255,11 @@ function hackmanLoop(timestamp) {
     }
     const mr = player.row + player.dy;
     const mc = player.col + player.dx;
+    player.prevRow = player.row;
+    player.prevCol = player.col;
     if (isPassable(mr, mc)) {
       player.row = mr;
-      player.col = mc;
-      // wrap
-      if (player.col < 0)    player.col = COLS - 1;
-      if (player.col >= COLS) player.col = 0;
+      player.col = wrapCol(mc);   // side tunnel
     }
     // eat dot
     const cell = maze[player.row][player.col];
@@ -3079,22 +3273,18 @@ function hackmanLoop(timestamp) {
       score += 50;
       dotsEaten++;
       powered = true;
-      powerTimer = 180;
+      powerUntil = timestamp + POWER_MS;
       playBeep(440, 0.15, 'sine');
     }
     document.getElementById('hm-score').textContent = score;
     if (dotsEaten >= totalDots) {
-      gameWon = true;
-      hackmanShowOverlay('ALL BYTES CONSUMED', 'MAINFRAME ACCESSED', '#00ff44');
+      hackmanWin();
       return;
     }
   }
 
-  // power timer
-  if (powered) {
-    powerTimer--;
-    if (powerTimer <= 0) { powered = false; }
-  }
+  // power-up wears off after POWER_MS (time-based, not frame-based)
+  if (powered && timestamp >= powerUntil) powered = false;
 
   // ghost movement
   ghosts.forEach(g => {
@@ -3103,28 +3293,34 @@ function hackmanLoop(timestamp) {
       // try to move in current direction, else pick random passable
       const dirs = [{dr:-1,dc:0},{dr:1,dc:0},{dr:0,dc:-1},{dr:0,dc:1}];
       let moved = false;
+      g.prevRow = g.row;
+      g.prevCol = g.col;
       const nr = g.row + g.dy;
       const nc = g.col + g.dx;
       if (isPassable(nr, nc) && Math.random() > 0.25) {
-        g.row = nr; g.col = nc; moved = true;
+        g.row = nr; g.col = wrapCol(nc); moved = true;
       }
       if (!moved) {
         const shuffled = dirs.sort(() => Math.random() - 0.5);
         for (let d of shuffled) {
           if (isPassable(g.row + d.dr, g.col + d.dc)) {
-            g.row += d.dr; g.col += d.dc;
+            g.row += d.dr; g.col = wrapCol(g.col + d.dc);
             g.dy = d.dr; g.dx = d.dc;
             break;
           }
         }
       }
     }
-    // collision with player
-    if (g.row === player.row && g.col === player.col) {
+    // collision with player: same tile, or the two swapped tiles this step
+    const swapped = g.prevRow === player.row && g.prevCol === player.col &&
+                    player.prevRow === g.row && player.prevCol === g.col;
+    if ((g.row === player.row && g.col === player.col) || swapped) {
       if (powered) {
         // eat ghost
         score += 200;
-        g.row = 9; g.col = 9;
+        document.getElementById('hm-score').textContent = score;
+        g.row = GHOST_HOME.row; g.col = GHOST_HOME.col;
+        g.prevRow = g.row; g.prevCol = g.col;
         playBeep(660, 0.2, 'sine');
       } else {
         lives--;
@@ -3132,29 +3328,59 @@ function hackmanLoop(timestamp) {
         document.getElementById('hm-lives').textContent = lives;
         if (lives <= 0) {
           gameOver = true;
-          hackmanShowOverlay('VIRUS DETECTED', 'SYSTEM TERMINATED', '#ff4444');
+          hackmanShowOverlay('VIRUS DETECTED', 'SYSTEM TERMINATED', '#ff4444',
+            { stats: 'SCORE ' + score + '   LEVEL ' + level + '   BEST ' + hackmanSaveBest(score) });
           return;
         }
-        // respawn player
-        player.col = 9; player.row = 12; player.dx = 0; player.dy = 0;
+        // respawn everyone on their spawn tiles so a ghost isn't sitting on the player
+        resetPositions();
       }
     }
   });
 
-  // mouth animation
-  player.mouth += 0.18 * player.mouthDir;
-  if (player.mouth > 0.45) player.mouthDir = -1;
-  if (player.mouth < 0)    { player.mouth = 0; player.mouthDir = 1; }
+  // mouth animation: open/close about 3 times a second, at any refresh rate
+  player.mouth = 0.225 * (1 - Math.cos(timestamp / 330 * Math.PI * 2));
 
   hackmanDraw();
 }
 
+/* Columns wrap around (the side tunnel); a wrapped wall is still a wall */
+function wrapCol(col) { return (col + COLS) % COLS; }
+
 function isPassable(row, col) {
-  if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
-  return maze[row][col] !== 1;
+  if (row < 0 || row >= ROWS) return false;
+  return maze[row][wrapCol(col)] !== 1;
 }
 
-function hackmanDraw() {
+/* Level cleared: flash the maze like the arcade game, then the win screen */
+function hackmanWin() {
+  gameWon = true;
+  hackmanStop();
+  const best = hackmanSaveBest(score);
+  [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => playBeep(f, 0.18, 'square'), i * 130));
+  let flashes = 0;
+  const flash = setInterval(() => {
+    hackmanDraw(flashes % 2 === 0);
+    if (++flashes >= 6) {
+      clearInterval(flash);
+      hackmanShowOverlay('ACCESS GRANTED', 'ALL ' + totalDots + ' BYTES CONSUMED \u00B7 LEVEL ' + level + ' CLEARED', '#00ff44',
+        { stats: 'SCORE ' + score + '   LIVES ' + lives + '   BEST ' + best, next: true });
+    }
+  }, 220);
+}
+
+/* Best score, remembered per visitor */
+function hackmanSaveBest(s) {
+  let best = 0;
+  try { best = parseInt(localStorage.getItem('hackmanBest') || '0', 10) || 0; } catch (_) {}
+  if (s > best) {
+    best = s;
+    try { localStorage.setItem('hackmanBest', String(best)); } catch (_) {}
+  }
+  return best;
+}
+
+function hackmanDraw(flashWalls) {
   const canvas = document.getElementById('hackman-canvas');
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#000011';
@@ -3166,10 +3392,10 @@ function hackmanDraw() {
       const x = c * TILE, y = r * TILE;
       const cell = maze[r][c];
       if (cell === 1) {
-        ctx.fillStyle = '#0044aa';
+        ctx.fillStyle = flashWalls ? '#ffffff' : '#0044aa';
         ctx.fillRect(x, y, TILE, TILE);
         // circuit board highlight
-        ctx.strokeStyle = '#0066ff';
+        ctx.strokeStyle = flashWalls ? '#aaccff' : '#0066ff';
         ctx.lineWidth = 1;
         ctx.strokeRect(x + 0.5, y + 0.5, TILE - 1, TILE - 1);
       } else if (cell === 0) {
@@ -3177,7 +3403,7 @@ function hackmanDraw() {
         ctx.fillRect(x + TILE/2 - 2, y + TILE/2 - 2, 4, 4);
       } else if (cell === 3) {
         // power pellet
-        const pulse = 0.5 + 0.5 * Math.sin(frameCount * 0.1);
+        const pulse = 0.5 + 0.5 * Math.sin(hmNow * 0.006);
         ctx.fillStyle = `rgba(0,255,200,${0.6 + 0.4 * pulse})`;
         ctx.beginPath();
         ctx.arc(x + TILE/2, y + TILE/2, 5, 0, Math.PI * 2);
@@ -3232,7 +3458,8 @@ function hackmanDraw() {
   });
 }
 
-function hackmanShowOverlay(msg, sub, color) {
+function hackmanShowOverlay(msg, sub, color, opts) {
+  opts = opts || {};
   hackmanRunning = false;
   const overlay = document.getElementById('hackman-overlay');
   const omsg = document.getElementById('hackman-overlay-msg');
@@ -3240,8 +3467,20 @@ function hackmanShowOverlay(msg, sub, color) {
   omsg.textContent = msg;
   omsg.style.color = color;
   osub.textContent = sub;
+  document.getElementById('hackman-overlay-stats').textContent = opts.stats || '';
+  document.getElementById('hackman-overlay-next').classList.toggle('show', !!opts.next);
+  document.getElementById('hackman-overlay-btn').textContent = opts.next ? 'PLAY AGAIN' : 'REBOOT SYSTEM';
   overlay.classList.add('show');
 }
+
+/* Enter on the end screen: next level after a win, restart after a loss */
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  if (!document.getElementById('hackman-overlay').classList.contains('show')) return;
+  if (!document.getElementById('win-hackman').classList.contains('open')) return;
+  e.preventDefault();
+  if (gameWon) hackmanNextLevel(); else hackmanRestart();
+});
 
 // Keyboard controls
 document.addEventListener('keydown', function(e) {
