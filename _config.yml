@@ -1,0 +1,4 @@
+# GitHub Pages (Jekyll) settings. The portfolio has no build step; this only
+# keeps repo docs off the live site.
+exclude:
+  - CLAUDE.md
