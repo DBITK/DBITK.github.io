@@ -24,7 +24,7 @@
   margin: 0; padding: 0;
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 20 24'%3E%3Cpath d='M1 1 L1 19 L5 14 L8 22 L11 21 L8 13 L14 13 Z' fill='%23111' stroke='%23fff' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath d='M2 3 L2 17 L5 13 L8 20 L10 19.5 L7 12 L13 12 Z' fill='white'/%3E%3Cpath d='M3 4 L3 16 L5.5 13 L8.5 19 L9.5 18.5 L6.5 11.5 L12 11.5 Z' fill='%23111'/%3E%3C/svg%3E") 1 1, default !important;
 }
-a, button, [role="button"], .desktop-icon, .win-close, .win-minimize, .taskbar-tab, .start-btn, .explorer-row {
+a, button, [role="button"], .desktop-icon, .win-close, .win-minimize, .win-maximize, .taskbar-tab, .start-btn, .explorer-row {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 20 24'%3E%3Cpath d='M1 1 L1 19 L5 14 L8 22 L11 21 L8 13 L14 13 Z' fill='%23111' stroke='%23c4202c' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath d='M2 3 L2 17 L5 13 L8 20 L10 19.5 L7 12 L13 12 Z' fill='%23c4202c'/%3E%3Cpath d='M3 4 L3 16 L5.5 13 L8.5 19 L9.5 18.5 L6.5 11.5 L12 11.5 Z' fill='%23111'/%3E%3C/svg%3E") 1 1, pointer !important;
 }
 
@@ -136,7 +136,7 @@ html, body {
    ============================================================= */
 #desktop {
   position: fixed;
-  inset: 0 0 28px 0;
+  inset: 0 0 calc(28px * var(--ui-scale)) 0;
   z-index: 1;
   overflow: hidden;
   opacity: 0;
@@ -364,9 +364,7 @@ html, body {
    WIN98 WINDOW SYSTEM
    ============================================================= */
 .win98-window {
-  position: absolute;
-  min-width: 300px;
-  min-height: 200px;
+  position: absolute;   /* size and minimum size are managed in JS (WINDOW GEOMETRY) */
   background: #d4d0c8;
   border-top: 2px solid #ffffff;
   border-left: 2px solid #ffffff;
@@ -457,13 +455,39 @@ html, body {
   overflow: auto;
 }
 
-/* resize handle */
-.win98-window .win-resize {
-  position: absolute;
-  right: 0; bottom: 0;
-  width: 12px; height: 12px;
-  cursor: se-resize !important;
+/* The whole desktop UI scales with the browser size (--ui-scale is set from JS,
+   see WINDOW GEOMETRY). Windows zoom their title bar and body only, so their
+   outer geometry stays in plain viewport pixels for dragging and resizing. */
+:root { --ui-scale: 1; }
+.win98-window > .win-titlebar,
+.win98-window > .win-body,
+#boot-inner, #desktop-label, #win-welcome, .desktop-icons,
+#taskbar, #start-menu, #ctx-menu, #shutdown-dlg { zoom: var(--ui-scale); }
+
+/* Maximize / restore button glyphs */
+.win-maximize::before {
+  content: "";
+  width: 7px; height: 6px;
+  border: 1px solid #000;
+  border-top-width: 2px;
 }
+.win98-window[data-maximized="1"] .win-maximize::before {
+  width: 5px; height: 4px;
+  transform: translate(-1px, 1px);
+  box-shadow: 2px -3px 0 -1px #d4d0c8, 2px -3px 0 0 #000;
+}
+
+/* Resize handles: built by JS on every edge and corner, straddling the border */
+.win-rh { position: absolute; z-index: 3; }
+.win-rh-n  { top: -5px;    left: 8px;  right: 8px;  height: 8px; cursor: ns-resize !important; }
+.win-rh-s  { bottom: -5px; left: 8px;  right: 8px;  height: 8px; cursor: ns-resize !important; }
+.win-rh-e  { right: -5px;  top: 8px;   bottom: 8px; width: 8px;  cursor: ew-resize !important; }
+.win-rh-w  { left: -5px;   top: 8px;   bottom: 8px; width: 8px;  cursor: ew-resize !important; }
+.win-rh-nw { top: -5px;    left: -5px;  width: 13px; height: 13px; cursor: nwse-resize !important; }
+.win-rh-se { bottom: -5px; right: -5px; width: 13px; height: 13px; cursor: nwse-resize !important; }
+.win-rh-ne { top: -5px;    right: -5px; width: 13px; height: 13px; cursor: nesw-resize !important; }
+.win-rh-sw { bottom: -5px; left: -5px;  width: 13px; height: 13px; cursor: nesw-resize !important; }
+.win98-window[data-maximized="1"] .win-rh { display: none; }
 
 /* =============================================================
    WINDOW: ABOUT — clean Win98 profile dialog
@@ -1460,12 +1484,13 @@ html, body {
   </div>
 
   <!-- WINDOW: ABOUT -->
-  <div class="win98-window" id="win-about" style="width:480px;height:440px;top:60px;left:120px;">
+  <div class="win98-window" id="win-about">
     <div class="win-titlebar" id="tb-about">
       <span class="win-icon-small">&#x1F464;</span>
       <span class="win-title">about.exe</span>
       <div class="win-controls">
         <div class="win-btn win-minimize" onclick="minimizeWindow('about')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-maximize" onclick="toggleMaximize('about')" title="Maximize"></div>
         <div class="win-btn win-close" onclick="closeWindow('about')" title="Close">&#x2715;</div>
       </div>
     </div>
@@ -1511,16 +1536,16 @@ html, body {
         </div>
       </div>
     </div>
-    <div class="win-resize"></div>
   </div>
 
   <!-- WINDOW: PROJECTS -->
-  <div class="win98-window" id="win-projects" style="width:560px;height:420px;top:80px;left:160px;">
+  <div class="win98-window" id="win-projects">
     <div class="win-titlebar" id="tb-projects">
       <span class="win-icon-small">&#x1F4C1;</span>
       <span class="win-title">projects/ — Windows Explorer</span>
       <div class="win-controls">
         <div class="win-btn win-minimize" onclick="minimizeWindow('projects')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-maximize" onclick="toggleMaximize('projects')" title="Maximize"></div>
         <div class="win-btn win-close" onclick="closeWindow('projects')" title="Close">&#x2715;</div>
       </div>
     </div>
@@ -1607,16 +1632,16 @@ html, body {
         </div>
       </div>
     </div>
-    <div class="win-resize"></div>
   </div>
 
   <!-- WINDOW: SKILLS -->
-  <div class="win98-window" id="win-skills" style="width:500px;height:460px;top:70px;left:140px;">
+  <div class="win98-window" id="win-skills">
     <div class="win-titlebar" id="tb-skills">
       <span class="win-icon-small">&#x1F4C4;</span>
       <span class="win-title">skills.json — [Read Only]</span>
       <div class="win-controls">
         <div class="win-btn win-minimize" onclick="minimizeWindow('skills')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-maximize" onclick="toggleMaximize('skills')" title="Maximize"></div>
         <div class="win-btn win-close" onclick="closeWindow('skills')" title="Close">&#x2715;</div>
       </div>
     </div>
@@ -1655,16 +1680,16 @@ html, body {
 <span class="t-prompt">$ </span><span class="terminal-cursor"></span></div>
       </div>
     </div>
-    <div class="win-resize"></div>
   </div>
 
   <!-- WINDOW: CONTACT -->
-  <div class="win98-window" id="win-contact" style="width:380px;height:300px;top:90px;left:150px;">
+  <div class="win98-window" id="win-contact">
     <div class="win-titlebar" id="tb-contact">
       <span class="win-icon-small">&#x2709;</span>
       <span class="win-title">contact.txt — Notepad</span>
       <div class="win-controls">
         <div class="win-btn win-minimize" onclick="minimizeWindow('contact')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-maximize" onclick="toggleMaximize('contact')" title="Maximize"></div>
         <div class="win-btn win-close" onclick="closeWindow('contact')" title="Close">&#x2715;</div>
       </div>
     </div>
@@ -1688,16 +1713,16 @@ html, body {
 hand-rolled HTML, no trackers</div>
       </div>
     </div>
-    <div class="win-resize"></div>
   </div>
 
   <!-- WINDOW: HACKMAN -->
-  <div class="win98-window" id="win-hackman" style="width:420px;height:380px;top:50px;left:130px;">
+  <div class="win98-window" id="win-hackman">
     <div class="win-titlebar" id="tb-hackman">
       <span class="win-icon-small">&#x2753;</span>
       <span class="win-title">??? — UNKNOWN PROGRAM</span>
       <div class="win-controls">
         <div class="win-btn win-minimize" onclick="minimizeWindow('hackman')" title="Minimize">&#x2014;</div>
+        <div class="win-btn win-maximize" onclick="toggleMaximize('hackman')" title="Maximize"></div>
         <div class="win-btn win-close" onclick="closeWindow('hackman')" title="Close">&#x2715;</div>
       </div>
     </div>
@@ -1726,7 +1751,6 @@ hand-rolled HTML, no trackers</div>
         </div>
       </div>
     </div>
-    <div class="win-resize"></div>
   </div>
 </div>
 
@@ -2061,6 +2085,127 @@ const windowMeta = {
   hackman:  { title: '??? — Unknown Program',  icon: '❓' },
 };
 
+/* =============================================================
+   WINDOW GEOMETRY — sizes scale with the browser viewport
+   ============================================================= */
+const TASKBAR_H = 28;
+const WIN_MIN = { w: 280, h: 160 };        // unscaled minimum size
+// Default geometry, designed for a 1440×860 desktop and scaled by uiScale
+const windowDefaults = {
+  about:    { w: 480, h: 440, x: 120, y: 60 },
+  projects: { w: 560, h: 420, x: 160, y: 80 },
+  skills:   { w: 500, h: 460, x: 140, y: 70 },
+  contact:  { w: 380, h: 300, x: 150, y: 90 },
+  hackman:  { w: 420, h: 380, x: 130, y: 50 },
+};
+let uiScale = 1;
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function desktopSize() {
+  return { w: window.innerWidth, h: window.innerHeight - TASKBAR_H * uiScale };
+}
+
+/* Based on the viewport in CSS pixels, so OS display scaling is respected:
+   0.85× on small laptops, 1.25× at 1080p, ~1.75× at 1440p, up to 2.4× for
+   4K at 100% scaling. Rounded to 0.05 steps. */
+function updateUiScale() {
+  const raw = Math.min(window.innerWidth / 1440, window.innerHeight / 860);
+  uiScale = Math.round(clamp(raw, 0.85, 2.4) * 20) / 20;
+  document.documentElement.style.setProperty('--ui-scale', uiScale);
+}
+
+function minWinSize() {
+  const d = desktopSize();
+  return {
+    w: Math.min(Math.round(WIN_MIN.w * uiScale), d.w),
+    h: Math.min(Math.round(WIN_MIN.h * uiScale), d.h),
+  };
+}
+
+/* Read geometry from inline styles so it works while a window is hidden */
+function getGeom(win) {
+  return {
+    left:   parseFloat(win.style.left)   || 0,
+    top:    parseFloat(win.style.top)    || 0,
+    width:  parseFloat(win.style.width)  || 0,
+    height: parseFloat(win.style.height) || 0,
+  };
+}
+
+function setGeom(win, g) {
+  win.style.left   = Math.round(g.left)   + 'px';
+  win.style.top    = Math.round(g.top)    + 'px';
+  win.style.width  = Math.round(g.width)  + 'px';
+  win.style.height = Math.round(g.height) + 'px';
+}
+
+function placeDefault(win) {
+  const def = windowDefaults[win.id.replace('win-', '')];
+  if (!def) return;
+  const d = desktopSize(), m = 8;
+  const width  = Math.min(def.w * uiScale, d.w - 2 * m);
+  const height = Math.min(def.h * uiScale, d.h - 2 * m);
+  setGeom(win, {
+    width, height,
+    left: clamp(def.x * uiScale, m, d.w - width - m),
+    top:  clamp(def.y * uiScale, m, d.h - height - m),
+  });
+}
+
+/* Shrink and nudge a window so it fits on the desktop */
+function fitToDesktop(win) {
+  const d = desktopSize(), min = minWinSize(), g = getGeom(win);
+  const width  = clamp(g.width,  min.w, d.w);
+  const height = clamp(g.height, min.h, d.h);
+  setGeom(win, {
+    width, height,
+    left: clamp(g.left, 0, d.w - width),
+    top:  clamp(g.top,  0, d.h - height),
+  });
+}
+
+function fillDesktop(win) {
+  const d = desktopSize();
+  setGeom(win, { left: 0, top: 0, width: d.w, height: d.h });
+}
+
+function toggleMaximize(id) {
+  const win = document.getElementById('win-' + id);
+  if (!win) return;
+  bringToFront(win);
+  const btn = win.querySelector('.win-maximize');
+  if (win.dataset.maximized !== '1') {
+    win.dataset.restore = JSON.stringify(getGeom(win));
+    win.dataset.maximized = '1';
+    fillDesktop(win);
+    if (btn) btn.title = 'Restore';
+  } else {
+    win.dataset.maximized = '0';
+    try { setGeom(win, JSON.parse(win.dataset.restore)); } catch (_) { placeDefault(win); }
+    fitToDesktop(win);
+    if (btn) btn.title = 'Maximize';
+  }
+}
+
+/* Re-layout on browser resize: untouched windows take the new default size,
+   windows the visitor moved or resized are kept but pulled back on screen. */
+let relayoutTimer = null;
+window.addEventListener('resize', function() {
+  if (window.__mobileMode) return;
+  clearTimeout(relayoutTimer);
+  relayoutTimer = setTimeout(function() {
+    updateUiScale();
+    document.querySelectorAll('.win98-window[data-placed="1"]').forEach(win => {
+      if (win.dataset.maximized === '1') fillDesktop(win);
+      else if (win.dataset.userGeom === '1') fitToDesktop(win);
+      else placeDefault(win);
+    });
+  }, 60);
+});
+
+updateUiScale();
+
 /* iconOpen: called from desktop icon double-click; sets URL hash */
 function iconOpen(id) {
   const linkable = ['about', 'projects', 'skills', 'contact'];
@@ -2073,6 +2218,10 @@ function iconOpen(id) {
 function openWindow(id) {
   const win = document.getElementById('win-' + id);
   if (!win) return;
+  if (win.dataset.placed !== '1') {
+    placeDefault(win);
+    win.dataset.placed = '1';
+  }
   win.classList.add('open');
   win.classList.remove('minimized');
   bringToFront(win);
@@ -2132,12 +2281,13 @@ function focusWindow(id) {
   bringToFront(win);
 }
 
-/* Dragging */
+/* Dragging (disabled while maximized, as on a real desktop) */
 document.querySelectorAll('.win-titlebar').forEach(tb => {
   tb.addEventListener('mousedown', function(e) {
     if (e.target.classList.contains('win-btn')) return;
     const win = tb.closest('.win98-window');
     bringToFront(win);
+    if (win.dataset.maximized === '1') return;
     const startX = e.clientX - win.offsetLeft;
     const startY = e.clientY - win.offsetTop;
     function onMove(e) {
@@ -2145,9 +2295,10 @@ document.querySelectorAll('.win-titlebar').forEach(tb => {
       let ny = e.clientY - startY;
       // keep in viewport
       nx = Math.max(-win.offsetWidth + 60, Math.min(window.innerWidth - 30, nx));
-      ny = Math.max(0, Math.min(window.innerHeight - 56, ny));
+      ny = Math.max(0, Math.min(desktopSize().h - TASKBAR_H * uiScale, ny));
       win.style.left = nx + 'px';
       win.style.top  = ny + 'px';
+      win.dataset.userGeom = '1';
     }
     function onUp() {
       document.removeEventListener('mousemove', onMove);
@@ -2163,27 +2314,7 @@ document.querySelectorAll('.win-titlebar').forEach(tb => {
   tb.addEventListener('dblclick', function(e) {
     if (e.target.classList.contains('win-btn')) return;
     const win = tb.closest('.win98-window');
-    if (!win) return;
-    const isMaximized = win.dataset.maximized === '1';
-    if (!isMaximized) {
-      // Save current geometry
-      win.dataset.prevLeft   = win.style.left;
-      win.dataset.prevTop    = win.style.top;
-      win.dataset.prevWidth  = win.style.width;
-      win.dataset.prevHeight = win.style.height;
-      win.dataset.maximized  = '1';
-      // Fill desktop area (above taskbar)
-      win.style.left   = '0px';
-      win.style.top    = '0px';
-      win.style.width  = window.innerWidth + 'px';
-      win.style.height = (window.innerHeight - 28) + 'px';
-    } else {
-      win.dataset.maximized = '0';
-      win.style.left   = win.dataset.prevLeft   || '60px';
-      win.style.top    = win.dataset.prevTop    || '40px';
-      win.style.width  = win.dataset.prevWidth  || '';
-      win.style.height = win.dataset.prevHeight || '';
-    }
+    if (win) toggleMaximize(win.id.replace('win-', ''));
   });
 });
 
@@ -2194,27 +2325,54 @@ document.querySelectorAll('.win98-window').forEach(win => {
   });
 });
 
-/* Resize handles */
-document.querySelectorAll('.win-resize').forEach(handle => {
-  handle.addEventListener('mousedown', function(e) {
-    e.stopPropagation();
-    const win = handle.closest('.win98-window');
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startW = win.offsetWidth;
-    const startH = win.offsetHeight;
-    function onMove(e) {
-      win.style.width  = Math.max(280, startW + (e.clientX - startX)) + 'px';
-      win.style.height = Math.max(160, startH + (e.clientY - startY)) + 'px';
-    }
-    function onUp() {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-    }
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
+/* Resize from any edge or corner */
+document.querySelectorAll('.win98-window').forEach(win => {
+  ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].forEach(dir => {
+    const handle = document.createElement('div');
+    handle.className = 'win-rh win-rh-' + dir;
+    handle.addEventListener('pointerdown', e => startResize(e, win, dir));
+    win.appendChild(handle);
   });
 });
+
+function startResize(e, win, dir) {
+  if (e.button !== 0 || win.dataset.maximized === '1') return;
+  e.preventDefault();
+  e.stopPropagation();
+  bringToFront(win);
+  const handle = e.currentTarget;
+  const start = getGeom(win);
+  const right = start.left + start.width;
+  const bottom = start.top + start.height;
+  const min = minWinSize(), d = desktopSize();
+  handle.setPointerCapture(e.pointerId);
+
+  function onMove(ev) {
+    const dx = ev.clientX - e.clientX;
+    const dy = ev.clientY - e.clientY;
+    const g = Object.assign({}, start);
+    if (dir.includes('e')) g.width = clamp(start.width + dx, min.w, Math.max(min.w, d.w - start.left));
+    if (dir.includes('s')) g.height = clamp(start.height + dy, min.h, Math.max(min.h, d.h - start.top));
+    if (dir.includes('w')) {
+      g.left = clamp(start.left + dx, Math.min(0, start.left), right - min.w);
+      g.width = right - g.left;
+    }
+    if (dir.includes('n')) {
+      g.top = clamp(start.top + dy, 0, bottom - min.h);
+      g.height = bottom - g.top;
+    }
+    setGeom(win, g);
+    win.dataset.userGeom = '1';
+  }
+  function onEnd() {
+    handle.removeEventListener('pointermove', onMove);
+    handle.removeEventListener('pointerup', onEnd);
+    handle.removeEventListener('lostpointercapture', onEnd);
+  }
+  handle.addEventListener('pointermove', onMove);
+  handle.addEventListener('pointerup', onEnd);
+  handle.addEventListener('lostpointercapture', onEnd);
+}
 
 /* Escape closes topmost */
 document.addEventListener('keydown', function(e) {
@@ -2352,14 +2510,14 @@ document.addEventListener('contextmenu', function(e) {
   // Only show on the desktop, not inside a window
   if (e.target.closest('.win98-window') || e.target.closest('#taskbar')) return;
   e.preventDefault();
-  // Show first so we can measure, then position
-  ctxMenu.style.left = e.clientX + 'px';
-  ctxMenu.style.top  = e.clientY + 'px';
+  // Show first so we can measure, then position. The menu is zoomed by
+  // --ui-scale, which also multiplies its left/top, so divide them back out.
   ctxMenu.classList.add('show');
-  const x = Math.min(e.clientX, window.innerWidth  - ctxMenu.offsetWidth  - 4);
-  const y = Math.min(e.clientY, window.innerHeight - ctxMenu.offsetHeight - 4);
-  ctxMenu.style.left = x + 'px';
-  ctxMenu.style.top  = y + 'px';
+  const r = ctxMenu.getBoundingClientRect();
+  const x = Math.min(e.clientX, window.innerWidth  - r.width  - 4);
+  const y = Math.min(e.clientY, window.innerHeight - r.height - 4);
+  ctxMenu.style.left = (x / uiScale) + 'px';
+  ctxMenu.style.top  = (y / uiScale) + 'px';
 });
 
 document.addEventListener('click', function(e) {
@@ -2500,9 +2658,27 @@ function hackmanStartGame() {
   document.getElementById('hackman-title-screen').style.display = 'none';
   const wrap = document.getElementById('hackman-canvas-wrap');
   wrap.style.display = 'flex';
+  fitHackmanCanvas();
   hackmanInit();
   hackmanRunning = true;
   hackmanLoop();
+}
+
+/* Scale the canvas to fill the window while keeping the maze's aspect ratio.
+   The drawing buffer stays 380×300; only its displayed size changes. */
+function fitHackmanCanvas() {
+  const inner  = document.querySelector('#win-hackman .win-body-inner');
+  const canvas = document.getElementById('hackman-canvas');
+  const hud    = document.getElementById('hackman-hud');
+  const availW = inner.clientWidth;
+  const availH = inner.clientHeight - (hud.offsetHeight || 22);
+  if (availW <= 0 || availH <= 0) return;
+  const s = Math.min(availW / canvas.width, availH / canvas.height);
+  canvas.style.width  = Math.floor(canvas.width  * s) + 'px';
+  canvas.style.height = Math.floor(canvas.height * s) + 'px';
+}
+if (window.ResizeObserver) {
+  new ResizeObserver(fitHackmanCanvas).observe(document.querySelector('#win-hackman .win-body-inner'));
 }
 
 function hackmanStop() {

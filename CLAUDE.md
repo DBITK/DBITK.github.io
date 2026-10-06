@@ -75,12 +75,32 @@ The window manager lives in the `WINDOW MANAGEMENT` JS section:
 - **Opening and closing:** `openWindow(id)`, `closeWindow(id)`, `minimizeWindow(id)` and
   `focusWindow(id)`. Open state is kept in `openWindows`, titles and icons in `windowMeta`.
 - **Stacking:** `bringToFront` raises the window and marks the other title bars inactive.
-- **Mouse:** drag by the title bar, double-click the title bar to maximize or restore
-  (geometry is saved in `data-prev*`), and resize from `.win-resize` (minimum 280×160).
+- **Mouse:** drag by the title bar. Maximize/restore with the title-bar button or a
+  double-click (`toggleMaximize(id)`; the restore geometry is kept in `data-restore`).
+  Resize from any edge or corner: JS adds eight `.win-rh` handles to every window and
+  uses pointer events. Dragging and resizing are disabled while a window is maximized.
+- **Sizing and scaling** (the `WINDOW GEOMETRY` JS section):
+  - Window sizes are not in the markup. Default geometry lives in `windowDefaults`,
+    designed for a 1440×860 desktop, and is applied on a window's first open
+    (`placeDefault`).
+  - `uiScale` comes from the viewport in CSS pixels (`min(vw/1440, vh/860)`), so OS
+    display scaling is respected. It runs from 0.85 on small laptops through 1.25 at
+    1080p and ~1.75 at 1440p, up to 2.4 for 4K at 100%, in 0.05 steps. It scales the
+    default sizes, the 280×160 minimum and the 28px taskbar height (`TASKBAR_H`).
+  - The CSS `--ui-scale` `zoom`s the whole desktop UI: each window's title bar and body
+    (not the window box itself, so drag and resize stay in viewport pixels), the boot
+    text, desktop icons, watermark, taskbar, Start menu, context menu, and the welcome
+    and shutdown dialogs. `#desktop`'s bottom inset follows the scaled taskbar.
+  - `left`/`top` on a zoomed element are multiplied by its zoom, so the context menu
+    divides its cursor position by `uiScale`. Do the same for any new zoomed popup.
+  - On a browser resize, windows the visitor hasn't touched take the new default size;
+    moved or resized windows (`data-user-geom`) are kept but pulled back on screen; a
+    maximized window refills the desktop.
+  - Measurements made inside a window body are in zoomed (local) CSS pixels.
 - **Keyboard:** Esc closes the topmost window and also dismisses the menus and the
   shutdown dialog.
 
-**Adding a window** takes all of the following: the markup `#win-<id>`, an entry in
+**Adding a window** takes all of the following: the markup `#win-<id>` (with a maximize button), entries in `windowDefaults` and
 `windowMeta`, a desktop icon, and items in the Start menu and context menu. If it should
 be deep-linkable, also add it to the `linkable` list in `iconOpen()` and to `validIds` in
 `dismissWelcome()`.
@@ -122,6 +142,8 @@ A Pac-Man clone ("eat the bytes before the antivirus finds you") on `#hackman-ca
 - **Speeds:** `PLAYER_MS_BASE` and `GHOST_MS_BASE`.
 - **Lifecycle:** closing the window calls `hackmanStop()`; the title listeners are
   attached on first open.
+- **Sizing:** `fitHackmanCanvas()` (run by a ResizeObserver) scales the canvas's
+  displayed size to fill the window. The drawing buffer stays 380×300.
 
 ### Copy that must stay in sync
 
