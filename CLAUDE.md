@@ -112,13 +112,30 @@ be deep-linkable, also add it to the `linkable` list in `iconOpen()` and to `val
 - **Taskbar** (`#taskbar`): Start button, a tab per open window (`addTaskbarTab` and
   related functions), and a tray date/clock (`updateClock`).
 - **Start menu** (`#start-menu`, sidebar "Derek OS"): Programs ▶ submenu, Print Resume,
-  GitHub, LinkedIn, Shut Down.
+  Screen Saver, CRT Effect toggle, GitHub, LinkedIn, Shut Down.
 - **Right-click context menu** (`#ctx-menu`): only appears on the bare desktop, not over
   windows or the taskbar. It opens windows, prints the resume, or opens "View Source"
   (github.com/DBITK).
 - **Shut Down** (`#shutdown-dlg` → `shutdownSequence()`): fades to "It is now safe to turn
   off your computer." This is final; a reload restores the site.
 - **Starfield** `<canvas id="starfield">` behind everything.
+- **3D Pipes** (`PIPES` JS section): a recreation of the Win98 screensaver.
+  - `createPipes(canvas, opts)` grows pipes through a 22×14×14 grid, uses a hand-rolled
+    perspective projection, and draws cylinders as layered strokes plus ball joints.
+  - It's used only as the full-screen screensaver (`#screensaver`). There are no
+    background pipes; the desktop background is just the starfield. Pipes grow
+    continuously and time-based (`opts.speed` cells/sec), and the screen clears when
+    it's full.
+  - The screensaver starts after 3 minutes idle (not during boot or while Hackman is
+    running), from Start → Screen Saver, or from the right-click menu
+    (`startScreensaver()`).
+  - Any input wakes it. Window-level capture listeners swallow the waking input so it
+    doesn't also trigger something underneath (for example, Esc closing a window).
+- **CRT effect** (`#crt`): a deliberately subtle top-layer overlay with no pointer
+  events. It draws scanlines, a vignette, a slow rolling band and a faint power-on flash at load.
+  - Toggle it from Start → CRT Effect (`toggleCrt()`). The choice is stored in
+    `localStorage['crt']` and applied as `body.crt-off`.
+  - It's hidden on mobile; reduced motion drops the flash and the roll.
 - **Desktop watermark** (`#desktop-label`): name and domain behind the icons and windows.
 - **Visual details:** custom SVG cursors (default plus a red "clickable" variant, at the
   top of the CSS), chunky always-visible Win98 scrollbars, and `user-select: none`

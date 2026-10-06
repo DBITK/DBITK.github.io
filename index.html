@@ -1072,9 +1072,67 @@ html, body {
 }
 
 /* =============================================================
+   PIPES SCREENSAVER
+   ============================================================= */
+#screensaver {
+  position: fixed;
+  inset: 0;
+  z-index: 99800;
+  display: none;
+  background: #000;
+  cursor: none !important;
+}
+#screensaver.show { display: block; }
+
+/* =============================================================
+   CRT OVERLAY
+   ============================================================= */
+#crt {
+  position: fixed;
+  inset: 0;
+  z-index: 99900;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(to bottom,
+      rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px,
+      transparent 1px, transparent 3px),
+    radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.125) 100%);
+  box-shadow: inset 0 0 90px rgba(0,0,0,0.135);
+}
+/* Power-on: a white line that opens into a flash, like a tube warming up */
+#crt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  animation: crtPowerOn 0.7s ease-out;
+}
+@keyframes crtPowerOn {
+  0%   { opacity: 0.25; transform: scale(0, 0.004); }
+  35%  { opacity: 0.25; transform: scale(1, 0.004); }
+  70%  { opacity: 0.09; transform: scale(1, 1); }
+  100% { opacity: 0;    transform: scale(1, 1); }
+}
+/* A faint bright band that rolls down the screen */
+#crt::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: -22%;
+  height: 22%;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.0075), transparent);
+  animation: crtRoll 9s linear infinite;
+}
+@keyframes crtRoll { to { transform: translateY(560%); } }
+body.crt-off #crt { display: none; }
+
+/* =============================================================
    REDUCED MOTION
    ============================================================= */
 @media (prefers-reduced-motion: reduce) {
+  #crt::before, #crt::after { animation: none; display: none; }
   .about-marquee, .badge, .terminal-cursor, .hackman-access, .hackman-press { animation: none; }
   .win98-window { animation: none; }
   #boot { transition: none; }
@@ -1776,6 +1834,7 @@ hand-rolled HTML, no trackers</div>
   <div class="ctx-item" onclick="ctxAction('contact')">contact.txt</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item" onclick="hideCtxMenu();window.print()">Print Resume...</div>
+  <div class="ctx-item" onclick="hideCtxMenu();startScreensaver()">Screen Saver</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item" onclick="hideCtxMenu();window.open('https://github.com/DBITK','_blank')">View Source</div>
 </div>
@@ -1795,6 +1854,8 @@ hand-rolled HTML, no trackers</div>
     </div>
     <div class="sm-sep"></div>
     <div class="sm-item" onclick="hideStartMenu();window.print()">&#x1F5A8; Print Resume...</div>
+    <div class="sm-item" onclick="hideStartMenu();startScreensaver()">&#x1F5A5; Screen Saver</div>
+    <div class="sm-item" id="sm-crt" onclick="hideStartMenu();toggleCrt()">&#x1F4FA; CRT Effect: On</div>
     <div class="sm-item" onclick="hideStartMenu();window.open('https://github.com/DBITK','_blank')">&#x1F517; GitHub</div>
     <div class="sm-item" onclick="hideStartMenu();window.open('https://linkedin.com/in/DBIT','_blank')">&#x1F517; LinkedIn</div>
     <div class="sm-sep"></div>
@@ -1895,6 +1956,12 @@ hand-rolled HTML, no trackers</div>
   </div>
 </div>
 
+<!-- SCREENSAVER (3D Pipes) -->
+<canvas id="screensaver"></canvas>
+
+<!-- CRT OVERLAY (scanlines, vignette, power-on flash) -->
+<div id="crt" aria-hidden="true"></div>
+
 <script>
 /* =============================================================
    STARFIELD
@@ -1924,7 +1991,11 @@ hand-rolled HTML, no trackers</div>
     }
   }
 
-  function tick() {
+  let lastT = 0;
+  function tick(t) {
+    // Time-based drift: same speed at 60, 120 or 240 Hz (speeds are px per 60 Hz frame)
+    const k = lastT ? Math.min((t - lastT) / (1000 / 60), 6) : 1;
+    lastT = t;
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#050510';
     ctx.fillRect(0, 0, W, H);
@@ -1934,7 +2005,7 @@ hand-rolled HTML, no trackers</div>
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
-      s.y += s.speed;
+      s.y += s.speed * k;
       if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
     }
     ctx.globalAlpha = 1;
@@ -1944,7 +2015,7 @@ hand-rolled HTML, no trackers</div>
   resize();
   initStars();
   window.addEventListener('resize', () => { resize(); initStars(); });
-  tick();
+  requestAnimationFrame(tick);
 })();
 
 /* =============================================================
@@ -2021,6 +2092,274 @@ hand-rolled HTML, no trackers</div>
       }
     }, 35);
   }, 3000);
+})();
+
+/* =============================================================
+   PIPES — the Win98 "3D Pipes" screensaver, drawn on a 2D canvas
+   with a hand-rolled perspective projection, shown full screen as
+   the idle screensaver (#screensaver). Pipes grow continuously, a
+   fraction of a grid cell per frame.
+   ============================================================= */
+const PIPE_COLORS = [          // [shadow, base, highlight]
+  ['#5a0f0f', '#c0392b', '#f08070'],
+  ['#0f4a17', '#2e9e44', '#86e08f'],
+  ['#0f2a5a', '#2f63c8', '#8db0f5'],
+  ['#5a4a0a', '#c9a227', '#f3dc7a'],
+  ['#0a4a4a', '#22a3a3', '#86e3e3'],
+  ['#4a0f4a', '#a63fa6', '#e39be3'],
+  ['#3a3a3a', '#a8a8a8', '#f0f0f0'],
+];
+const PIPE_DIRS = [[1,0,0], [-1,0,0], [0,1,0], [0,-1,0], [0,0,1], [0,0,-1]];
+
+function createPipes(canvas, opts) {
+  const ctx = canvas.getContext('2d');
+  const GX = 22, GY = 14, GZ = 14;           // grid cells
+  const YAW = 0.5, PITCH = 0.32, DIST = 34;  // camera
+  const cy = Math.cos(YAW), sy = Math.sin(YAW);
+  const cp = Math.cos(PITCH), sp = Math.sin(PITCH);
+  let W, H, unit, occupied, pipes, cellsGrown;
+  let raf = null, running = false, last = 0;
+
+  const rand = n => Math.floor(Math.random() * n);
+  const key = (x, y, z) => x + GX * (y + GY * z);
+  const free = (x, y, z) =>
+    x >= 0 && y >= 0 && z >= 0 && x < GX && y < GY && z < GZ && !occupied[key(x, y, z)];
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    unit = Math.min(W / GX, H / GY) * 1.1;
+  }
+
+  /* Grid coordinates (fractional allowed) to screen, with a depth factor */
+  function project(x, y, z) {
+    x -= GX / 2 - 0.5; y -= GY / 2 - 0.5; z -= GZ / 2 - 0.5;
+    const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
+    const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
+    const f = DIST / (DIST + z2);
+    return { x: W / 2 + x1 * f * unit, y: H / 2 + y2 * f * unit, f };
+  }
+
+  function clear() {
+    ctx.clearRect(0, 0, W, H);
+    if (opts.background) { ctx.fillStyle = opts.background; ctx.fillRect(0, 0, W, H); }
+    occupied = new Uint8Array(GX * GY * GZ);
+    pipes = [];
+    cellsGrown = 0;
+  }
+
+  /* Ball joint, lit from the upper left */
+  function drawBall(pt, color) {
+    const r = opts.radius * unit * pt.f * 1.2;
+    const g = ctx.createRadialGradient(pt.x - r * 0.35, pt.y - r * 0.35, r * 0.1, pt.x, pt.y, r);
+    g.addColorStop(0, color[2]);
+    g.addColorStop(0.5, color[1]);
+    g.addColorStop(1, color[0]);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /* One sliver of pipe: shadow, body and highlight strokes, the lighter ones
+     shifted toward the light so it reads as a cylinder. Each sliver starts a
+     hair behind the previous one so there are no anti-aliasing seams. */
+  function drawSliver(p, a, b) {
+    const r = opts.radius * unit * (a.f + b.f) / 2;
+    const ax = a.x - p.ux * 0.75, ay = a.y - p.uy * 0.75;
+    ctx.lineCap = 'butt';
+    [[p.color[0], 2.0, 0], [p.color[1], 1.5, 0.12], [p.color[2], 0.55, 0.42]].forEach(([c, w, off]) => {
+      ctx.strokeStyle = c;
+      ctx.lineWidth = r * w;
+      ctx.beginPath();
+      ctx.moveTo(ax + p.nx * r * off, ay + p.ny * r * off);
+      ctx.lineTo(b.x + p.nx * r * off, b.y + p.ny * r * off);
+      ctx.stroke();
+    });
+  }
+
+  /* Start a straight run at the pipe's current cell: place a joint and work
+     out the run's on-screen direction and which side faces the light */
+  function startRun(p) {
+    p.joint = project(p.x, p.y, p.z);
+    p.from = p.joint;
+    const to = project(p.x + p.dir[0], p.y + p.dir[1], p.z + p.dir[2]);
+    let ux = to.x - p.joint.x, uy = to.y - p.joint.y;
+    const len = Math.hypot(ux, uy) || 1;
+    p.ux = ux / len; p.uy = uy / len;
+    p.nx = -p.uy; p.ny = p.ux;
+    if (p.nx + p.ny > 0) { p.nx = -p.nx; p.ny = -p.ny; }
+    drawBall(p.joint, p.color);
+  }
+
+  /* Pick the direction for the next cell and reserve it. False if boxed in. */
+  function beginMove(p) {
+    const open = PIPE_DIRS.filter(d => free(p.x + d[0], p.y + d[1], p.z + d[2]));
+    if (!open.length) return false;
+    if (!open.includes(p.dir) || Math.random() < 0.22) {
+      const turns = open.filter(d => d !== p.dir);
+      if (turns.length) {
+        p.dir = turns[rand(turns.length)];
+        startRun(p);
+      }
+    }
+    occupied[key(p.x + p.dir[0], p.y + p.dir[1], p.z + p.dir[2])] = 1;
+    return true;
+  }
+
+  function spawn() {
+    for (let tries = 0; tries < 50; tries++) {
+      const x = rand(GX), y = rand(GY), z = rand(GZ);
+      if (!free(x, y, z)) continue;
+      occupied[key(x, y, z)] = 1;
+      const p = { x, y, z, t: 0, dir: PIPE_DIRS[rand(6)], color: PIPE_COLORS[rand(PIPE_COLORS.length)] };
+      startRun(p);
+      if (beginMove(p)) pipes.push(p);
+      return;
+    }
+  }
+
+  /* Draw the pipe from where it was last drawn to fraction t of the way
+     into the next cell, then keep the run's joint on top */
+  function drawTo(p, t) {
+    const to = project(p.x + p.dir[0] * t, p.y + p.dir[1] * t, p.z + p.dir[2] * t);
+    drawSliver(p, p.from, to);
+    p.from = to;
+    drawBall(p.joint, p.color);
+  }
+
+  /* Grow every pipe by `cells` grid cells (fractional) */
+  function grow(cells) {
+    if (pipes.length === 0 || (pipes.length < opts.maxPipes && Math.random() < 0.06 * cells)) spawn();
+    for (let i = pipes.length - 1; i >= 0; i--) {
+      const p = pipes[i];
+      p.t += cells;
+      let alive = true;
+      while (p.t >= 1) {
+        p.t -= 1;
+        drawTo(p, 1);
+        p.x += p.dir[0]; p.y += p.dir[1]; p.z += p.dir[2];
+        cellsGrown++;
+        if (!beginMove(p)) {                    // boxed in: cap it and retire
+          drawBall(project(p.x, p.y, p.z), p.color);
+          pipes.splice(i, 1);
+          alive = false;
+          break;
+        }
+      }
+      if (alive) drawTo(p, p.t);
+    }
+    if (cellsGrown > opts.maxCells) clear();
+  }
+
+  /* Growth is time-based, so speed is the same at 60, 120 or 144 Hz */
+  function frame(t) {
+    if (!running) return;
+    const dt = last ? Math.min((t - last) / 1000, 0.1) : 0;
+    last = t;
+    if (dt > 0) grow(opts.speed * dt);
+    raf = requestAnimationFrame(frame);
+  }
+
+  resize();
+  clear();
+  return {
+    start()   { if (running) return; running = true; last = 0; raf = requestAnimationFrame(frame); },
+    stop()    { running = false; if (raf) cancelAnimationFrame(raf); raf = null; },
+    restart() { resize(); clear(); },
+    prefill(n) { for (let i = 0; i < n; i++) grow(1); },
+  };
+}
+
+/* Idle screensaver */
+(function() {
+  window.startScreensaver = function() {};
+  if (window.__mobileMode) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IDLE_MS = 3 * 60 * 1000;
+
+  const ssCanvas = document.getElementById('screensaver');
+  const ss = createPipes(ssCanvas,
+    { radius: 0.32, speed: 14, maxPipes: 2, maxCells: 900, background: '#000' });
+
+  let lastActivity = Date.now(), ssOn = false, ssStart = 0, ssMouse = null;
+
+  window.startScreensaver = function() {
+    if (ssOn || window.__shutDown) return;
+    hideStartMenu();
+    hideCtxMenu();
+    ssOn = true;
+    ssStart = Date.now();
+    ssMouse = null;
+    ss.restart();
+    ssCanvas.classList.add('show');
+    if (reduceMotion) ss.prefill(400); else ss.start();
+  };
+
+  function stopScreensaver() {
+    ssOn = false;
+    ss.stop();
+    ssCanvas.classList.remove('show');
+    lastActivity = Date.now();
+  }
+
+  /* Any input wakes the screen. While the saver is up, the waking input is
+     swallowed so it doesn't also click or close something underneath. */
+  function onActivity(e) {
+    lastActivity = Date.now();
+    if (!ssOn) return;
+    if (e.type === 'mousemove') {
+      // Ignore tiny jitter and the movement right after launching from a menu
+      if (!ssMouse) { ssMouse = { x: e.clientX, y: e.clientY }; return; }
+      const moved = Math.hypot(e.clientX - ssMouse.x, e.clientY - ssMouse.y);
+      if (moved < 8 || Date.now() - ssStart < 800) return;
+    }
+    e.stopPropagation();
+    if (e.type !== 'mousemove' && e.cancelable) e.preventDefault();
+    stopScreensaver();
+  }
+  ['mousemove', 'mousedown', 'keydown', 'wheel', 'touchstart'].forEach(type =>
+    window.addEventListener(type, onActivity, { capture: true, passive: false }));
+  document.addEventListener('visibilitychange', () => { lastActivity = Date.now(); });
+
+  setInterval(function() {
+    if (ssOn || reduceMotion || document.hidden || window.__shutDown) return;
+    if (!document.getElementById('desktop').classList.contains('visible')) return;
+    if (typeof hackmanRunning !== 'undefined' && hackmanRunning) return;
+    if (Date.now() - lastActivity >= IDLE_MS) window.startScreensaver();
+  }, 1000);
+
+  let resizeTimer = null;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { if (ssOn) ss.restart(); }, 200);
+  });
+})();
+
+/* =============================================================
+   CRT EFFECT — scanlines and vignette overlay; toggle from the
+   Start menu, remembered per visitor
+   ============================================================= */
+(function() {
+  const crt = document.getElementById('crt');
+  window.toggleCrt = function() {};
+  if (window.__mobileMode) { crt.style.display = 'none'; return; }
+  let on = true;
+  try { on = localStorage.getItem('crt') !== 'off'; } catch (_) {}
+  function apply() {
+    document.body.classList.toggle('crt-off', !on);
+    document.getElementById('sm-crt').innerHTML = '&#x1F4FA; CRT Effect: ' + (on ? 'On' : 'Off');
+  }
+  window.toggleCrt = function() {
+    on = !on;
+    try { localStorage.setItem('crt', on ? 'on' : 'off'); } catch (_) {}
+    apply();
+  };
+  apply();
 })();
 
 /* =============================================================
@@ -2550,6 +2889,7 @@ function shutdownSequence() {
   setTimeout(() => {
     document.body.style.background = '#000';
     document.getElementById('starfield').style.display = 'none';
+    window.__shutDown = true;   // keeps the screensaver from waking
     const msg = document.createElement('div');
     msg.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Courier New",monospace;font-size:16px;color:#fff;background:#000;z-index:999999;';
     msg.textContent = 'It is now safe to turn off your computer.';
