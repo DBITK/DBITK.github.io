@@ -58,6 +58,119 @@
   const tourExhibits = () => (window.MUSEUM_TOUR ? window.MUSEUM_TOUR.ex : D.defaultTour);
 
   /* ---------------------------------------------------------------
+     Music: each room can name a track in exhibits.js. Tracks loop
+     sample-accurately through the Web Audio API (a plain <audio loop>
+     leaves a gap at the seam). Nothing loads or plays until the
+     visitor picks sound on; the choice is remembered. Music pauses
+     while the window is minimized or the tab is hidden, and stops
+     when the museum closes.
+     --------------------------------------------------------------- */
+  const music = (function () {
+    let ctx = null, master = null, current = null, wanted = null;
+    const buffers = {};
+    let enabled = false;
+    try { enabled = localStorage.getItem('museumSound') === 'on'; } catch (_) {}
+
+    const win = () => document.getElementById('win-museum');
+    const audible = () => win().classList.contains('open') && !win().classList.contains('minimized') && !document.hidden;
+
+    function ensureCtx() {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return false;
+        ctx = new AC();
+        master = ctx.createGain();
+        master.connect(ctx.destination);
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return true;
+    }
+
+    /* First source that decodes wins (Opus, then AAC for older Safari).
+       A decoded track is uncompressed in memory (~10 MB per minute of
+       stereo), so only the two most recent tracks are kept. */
+    function load(id) {
+      if (!buffers[id]) {
+        const keep = [id, current && current.id];
+        Object.keys(buffers).forEach(k => { if (!keep.includes(k)) delete buffers[k]; });
+        buffers[id] = (async () => {
+          for (const url of D.music[id].src) {
+            try {
+              const r = await fetch(url);
+              if (r.ok) return await ctx.decodeAudioData(await r.arrayBuffer());
+            } catch (_) {}
+          }
+          throw new Error('no playable source for ' + id);
+        })();
+      }
+      return buffers[id];
+    }
+
+    function fadeOut(c, secs) {
+      if (!c) return;
+      const now = ctx.currentTime;
+      c.gain.gain.cancelScheduledValues(now);
+      c.gain.gain.setValueAtTime(c.gain.gain.value, now);
+      c.gain.gain.linearRampToValueAtTime(0, now + secs);
+      c.src.stop(now + secs + 0.05);
+    }
+
+    async function play(id) {
+      if (id) wanted = id;
+      if (!enabled || !wanted || !D.music || !D.music[wanted] || !audible() || !ensureCtx()) return;
+      if (current && current.id === wanted) return;
+      const target = wanted, track = D.music[target];
+      let buf;
+      try { buf = await load(target); } catch (_) { return; }
+      if (wanted !== target || !enabled || !audible() || (current && current.id === target)) return;
+
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+      src.loopStart = track.loopStart || 0;
+      src.loopEnd = Math.min(track.loopEnd || buf.duration, buf.duration);
+      const gain = ctx.createGain();
+      gain.gain.value = track.volume || 0.6;   // starts at full volume on the first beat, no fade-in
+      src.connect(gain);
+      gain.connect(master);
+      src.start();
+      if (current) { current.src.stop(); }      // switching tracks: cut, no crossfade
+      current = { id: target, src, gain };
+    }
+
+    function stop(secs) {
+      if (ctx && current) fadeOut(current, secs || 0.5);
+      current = null;
+    }
+
+    function setEnabled(on) {
+      enabled = on;
+      try { localStorage.setItem('museumSound', on ? 'on' : 'off'); } catch (_) {}
+      if (on) play(); else stop();
+      updateToggle();
+    }
+
+    /* Minimize or hide the tab: pause in place. Close: stop. */
+    function sync() {
+      if (!ctx) return;
+      if (!win().classList.contains('open')) { stop(0.2); return; }
+      if (audible()) { ctx.resume(); play(); } else ctx.suspend();
+    }
+    document.addEventListener('visibilitychange', sync);
+    new MutationObserver(sync).observe(win(), { attributes: true, attributeFilter: ['class'] });
+
+    function updateToggle() {
+      const b = document.querySelector('.m-sound');
+      if (!b) return;
+      b.textContent = enabled ? '🔊' : '🔇';
+      b.title = enabled ? 'Sound on (click to mute)' : 'Sound off (click for music)';
+      b.setAttribute('aria-pressed', String(enabled));
+    }
+
+    return { play, setEnabled, updateToggle, isEnabled: () => enabled, ensureCtx };
+  })();
+
+  /* ---------------------------------------------------------------
      Docent: pixel-art Derek (12×24 grid)
      --------------------------------------------------------------- */
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -121,7 +234,8 @@
     host.innerHTML =
       '<div class="museum-fit"><div class="museum-stage">' +
       '<div class="m-art"></div><div class="m-hotspots"></div><div class="m-layer"></div>' +
-      '<div class="m-status"><span class="m-room"></span><span class="m-label"></span></div>' +
+      '<div class="m-status"><span class="m-room"></span><span class="m-label"></span>' +
+      '<button class="m-sound" aria-label="Music"></button></div>' +
       '</div></div>';
     fitEl = host.querySelector('.museum-fit');
     stage = host.querySelector('.museum-stage');
@@ -130,6 +244,11 @@
     layerEl = host.querySelector('.m-layer');
     statusRoom = host.querySelector('.m-room');
     statusLabel = host.querySelector('.m-label');
+    host.querySelector('.m-sound').addEventListener('click', () => {
+      music.ensureCtx();                       // inside the click, so the browser allows audio
+      music.setEnabled(!music.isEnabled());
+    });
+    music.updateToggle();
     if (window.ResizeObserver) new ResizeObserver(fitStage).observe(host);
     fitStage();
     built = true;
@@ -187,6 +306,7 @@
 
     statusRoom.textContent = '■ ' + sc.title;
     setLabel('');
+    if (sc.music) music.play(sc.music);   // rooms without a track keep the current one going
     if (sceneId === 'lobby') { placeDocent(sc.docent); greet(); }
   }
 
@@ -595,12 +715,23 @@
         clearInterval(iv);
         s.querySelector('.m-loadbar').remove();
         msg.remove();
-        const c = document.createElement('div');
-        c.className = 'm-click';
-        c.textContent = '[ CLICK ANYWHERE TO ENTER ]';
-        s.appendChild(c);
-        s.style.cursor = 'pointer';
-        s.addEventListener('click', () => { s.remove(); go('lobby'); }, { once: true });
+        // CD-ROM style: the visitor chooses sound, which also unlocks audio in the browser
+        const choose = withSound => {
+          if (withSound) music.ensureCtx();
+          music.setEnabled(withSound);
+          s.remove();
+          go('lobby');
+        };
+        const row = document.createElement('div');
+        row.className = 'm-enter';
+        [['[ ENTER WITH SOUND 🔊 ]', true], ['[ ENTER QUIETLY ]', false]].forEach(([text, on]) => {
+          const b = document.createElement('button');
+          b.className = 'm-click';
+          b.textContent = text;
+          b.addEventListener('click', () => choose(on), { once: true });
+          row.appendChild(b);
+        });
+        s.appendChild(row);
       }
     }, reduceMotion ? 60 : 420);
   }

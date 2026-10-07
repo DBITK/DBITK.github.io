@@ -218,8 +218,13 @@ A 90s CD-ROM-style museum inside the MUSEUM.EXE window; the design is in `docs/M
   600 characters max).
 - **Nothing live:** the museum makes no AI calls or other network requests beyond its
   own files.
-- **Not in the repo:** the full-size room renders stay in `museum/rooms/originals/`
-  (git-ignored); only the web copies are committed.
+- **Music:** opt-in at the splash, plus a speaker toggle in the status bar. Loops are
+  seamless via Web Audio; details and the encoding steps are in `docs/MUSEUM.md`.
+- **Not in the repo:** full-size room renders (`museum/rooms/originals/`) and WAV
+  masters (`museum/audio/originals/`) are git-ignored; only the web copies are committed.
+- **Cache busting:** `index.html` loads `museum.css`, `exhibits.js` and `museum.js`
+  with `?v=N`. Bump N whenever any of them change, so returning visitors never get
+  a mismatched mix of old and new files.
 
 ## GRSB site (`grsb/` + `grsb-backend/`)
 

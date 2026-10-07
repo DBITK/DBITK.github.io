@@ -18,6 +18,20 @@ window.MUSEUM_DATA = {
   /* Exhibits open in the lobby when there is no tour link */
   defaultTour: ['canary-lab', 'eli5'],
 
+  /* Music. Encode from the WAV in museum/audio/originals/ (git-ignored):
+       ffmpeg -i X.wav -c:a libopus -b:a 128k -vbr on x.ogg
+       ffmpeg -i X.wav -c:a aac -b:a 160k -movflags +faststart x.m4a
+     loopEnd is the original's exact length (samples ÷ sample rate), so the
+     loop never includes encoder padding. A room plays a track by naming it
+     in `music`; rooms without one keep the current track going. */
+  music: {
+    mall: {
+      src: ['museum/audio/mall.ogg', 'museum/audio/mall.m4a'],
+      loopEnd: 1867765 / 44100,
+      volume: 0.55,
+    },
+  },
+
   exhibits: {
     'canary-lab': {
       title: 'Canary Lab',
@@ -49,6 +63,7 @@ window.MUSEUM_DATA = {
     lobby: {
       title: 'Lobby',
       art: 'museum/rooms/mall.jpg',
+      music: 'mall',
       docent: { x: 548, y: 338 },
       entrances: {
         'canary-lab': { x: 103, y: 196, w: 146, h: 82, sign: { x: 176, y: 186, text: 'CANARY LAB' },

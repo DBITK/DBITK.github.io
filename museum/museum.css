@@ -280,7 +280,26 @@
   background: repeating-linear-gradient(90deg, #1084d0 0 10px, #000080 10px 12px);
   transition: width 0.25s linear;
 }
-.m-click { font: bold 13px "Courier New", monospace; color: #9fd3ff; animation: mBlink 1s step-end infinite; }
+.m-enter { display: flex; gap: 18px; }
+.m-click {
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  font: bold 13px "Courier New", monospace;
+  color: #9fd3ff;
+}
+.m-click:first-child { animation: mBlink 1s step-end infinite; }
+.m-click:hover, .m-click:focus-visible { color: #ffe14d; border-color: #ffe14d; animation: none; outline: none; }
+
+/* Speaker toggle at the right of the status bar */
+.m-sound {
+  pointer-events: auto;
+  background: none;
+  border: none;
+  padding: 0 0 0 10px;
+  font-size: 14px;
+  line-height: 24px;
+}
 @keyframes mBlink { 50% { opacity: 0; } }
 
 /* Canary Lab simulation */

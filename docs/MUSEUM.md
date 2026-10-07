@@ -27,7 +27,7 @@ Each exhibit is one room with six parts:
 | Placard | Title, 2–3 sentences of what and why, and "skills on display" tags. |
 | Evidence | Repo, live demo, and the résumé line it backs. |
 | ELI5 card | The plain-language version, collected in the ELI5 Corner. |
-| Soundtrack | Optional per-room track from Derek (planned, not in the MVP). |
+| Soundtrack | Optional per-room track from Derek, looped seamlessly (see Music). |
 
 Exhibits and room layouts are data in `museum/exhibits.js`; the engine is
 `museum/museum.js`.
@@ -46,6 +46,29 @@ Exhibits and room layouts are data in `museum/exhibits.js`; the engine is
 - **Art pipeline:** originals go in `museum/rooms/originals/` (git-ignored, so they
   stay local). Commit web copies at 1720×960 JPEG, quality ~82, about 250–320 KB each.
 - **Every room except the lobby** has a ◄ LOBBY button, so nobody gets lost.
+
+## Music
+
+- **Sound is opt-in.** The splash offers *Enter with sound* or *Enter quietly*.
+  A speaker toggle sits in the status bar, and the choice is remembered. With
+  sound off, no audio is downloaded at all.
+- **Seamless loops.** Tracks play through the Web Audio API with a
+  sample-accurate loop (a plain `<audio loop>` leaves a gap at the seam).
+  `loopEnd` is set to the original WAV's exact length, so encoder padding is
+  never part of the loop.
+- **Per room.** A scene names a track in `music`; rooms without one keep the
+  current track going. Tracks start at full volume (no fade-in). Music pauses when the window
+  is minimized or the tab is hidden, and stops when the museum closes.
+- **Memory.** A decoded track is uncompressed (~10 MB of RAM per minute of
+  stereo), so only the two most recent tracks are kept.
+- **Pipeline.** WAV originals go in `museum/audio/originals/` (git-ignored).
+  Encode Opus (`libopus`, 128k, the main file) plus AAC (160k, a fallback for
+  older Safari), and check that both decode to the original's sample count.
+  The commands are in `exhibits.js`.
+
+| Track | Room | Length | Web size |
+|---|---|---|---|
+| `mall` (MALLINTRO.wav) | Lobby | 42.35 s (1,867,765 samples @ 44.1 kHz) | ~800 KB Opus / ~880 KB AAC |
 
 ## Navigation
 
@@ -87,5 +110,5 @@ https://derekbartlett.com/#tour=<base64url JSON>
 
 - Pipeline Factory (CI/CD repo), Listening Booth (Derek's tracks), Robot
   Workshop (AI scripting, staged), Server Room (homelab), Arcade.
-- Per-room music with a sound-on switch.
+- Tracks for the other rooms.
 - Link-builder page.
