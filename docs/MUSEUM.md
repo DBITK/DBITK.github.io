@@ -42,6 +42,8 @@ Exhibits and room layouts are data in `museum/exhibits.js`; the engine is
 | ELI5 Corner | `basement.jpg`, an 80s basement | The TV plays ELI5 "tapes"; the old Mac lists every tape |
 
 - **The stage** is 860×480 (the renders' shape), scaled to fit the window.
+- **Hotspots are traced polygons** (`poly` in `exhibits.js`, render pixels ÷ 2), so each
+  object's own outline glows on hover. A plain box (`x, y, w, h`) also works.
   Hotspot boxes are in those stage coordinates.
 - **Art pipeline:** originals go in `museum/rooms/originals/` (git-ignored, so they
   stay local). Commit web copies at 1720×960 JPEG, quality ~82, about 250–320 KB each.
@@ -69,6 +71,7 @@ Exhibits and room layouts are data in `museum/exhibits.js`; the engine is
 | Track | Room | Length | Web size |
 |---|---|---|---|
 | `mall` (MALLINTRO.wav) | Lobby | 42.35 s (1,867,765 samples @ 44.1 kHz) | ~800 KB Opus / ~880 KB AAC |
+| `spacechair` (SpaceChair.wav) | Canary Lab | 75.43 s (3,326,400 samples @ 44.1 kHz) | ~1.5 MB Opus / ~1.5 MB AAC |
 
 ## Navigation
 

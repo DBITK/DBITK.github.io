@@ -274,18 +274,10 @@
       ? '<img alt="" src="' + esc(sc.art) + '">'
       : '<div class="m-noart">' + esc(sc.title) + '</div>';
     layerEl.innerHTML = '';
-    hotEl.innerHTML = '';
 
+    hotEl.innerHTML = '<svg class="m-hotsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '"></svg>';
     sceneHotspots(sceneId).forEach(h => {
-      const b = document.createElement('button');
-      b.className = 'm-hotspot' + (h.closed ? ' m-closed' : '');
-      b.style.cssText = 'left:' + h.x + 'px;top:' + h.y + 'px;width:' + h.w + 'px;height:' + h.h + 'px;';
-      b.setAttribute('aria-label', h.label);
-      b.addEventListener('mouseenter', () => setLabel(h.label));
-      b.addEventListener('focus', () => setLabel(h.label));
-      b.addEventListener('mouseleave', () => setLabel(''));
-      b.addEventListener('click', () => runAction(h.action));
-      hotEl.appendChild(b);
+      addHotspot(h, () => runAction(h.action));
       if (h.sign) {   // neon sign over the storefront
         const s = document.createElement('div');
         s.className = 'm-sign' + (h.closed ? ' m-sign-off' : '');
@@ -319,14 +311,29 @@
     d.style.cssText = 'left:' + docentPos.x + 'px;top:' + docentPos.y + 'px;';
     d.innerHTML = docentSvg(4);
     layerEl.appendChild(d);
-    const talk = document.createElement('button');
-    talk.className = 'm-hotspot';
-    talk.style.cssText = 'left:' + (docentPos.x - 4) + 'px;top:' + (docentPos.y - 4) + 'px;width:56px;height:104px;';
-    talk.setAttribute('aria-label', 'Talk to the docent');
-    talk.addEventListener('mouseenter', () => setLabel('Talk to the docent'));
-    talk.addEventListener('mouseleave', () => setLabel(''));
-    talk.addEventListener('click', greet);
-    hotEl.appendChild(talk);
+    addHotspot({ x: docentPos.x - 2, y: docentPos.y - 2, w: 52, h: 100, label: 'Talk to the docent' }, greet);
+  }
+
+  /* A clickable area: an SVG polygon traced around the object (`poly`:
+     [[x, y], ...] in stage coordinates), or a plain box (x, y, w, h).
+     It's a real button for keyboards and screen readers too. */
+  function addHotspot(h, onActivate) {
+    const pts = h.poly || [[h.x, h.y], [h.x + h.w, h.y], [h.x + h.w, h.y + h.h], [h.x, h.y + h.h]];
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    p.setAttribute('points', pts.map(q => q.join(',')).join(' '));
+    p.setAttribute('class', 'm-hot' + (h.closed ? ' m-closed' : ''));
+    p.setAttribute('tabindex', '0');
+    p.setAttribute('role', 'button');
+    p.setAttribute('aria-label', h.label);
+    p.addEventListener('mouseenter', () => setLabel(h.label));
+    p.addEventListener('focus', () => setLabel(h.label));
+    p.addEventListener('mouseleave', () => setLabel(''));
+    p.addEventListener('blur', () => setLabel(''));
+    p.addEventListener('click', onActivate);
+    p.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onActivate(); }
+    });
+    hotEl.querySelector('.m-hotsvg').appendChild(p);
   }
 
   function say(text, heading) {

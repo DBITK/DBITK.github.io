@@ -2,8 +2,8 @@
    MUSEUM EXHIBITS — the content. See docs/MUSEUM.md for what the
    parts of an exhibit mean; the engine that runs them is museum.js.
 
-   Rooms are 860×480 stage coordinates over Derek's renders in
-   museum/rooms/ (web copies; full-size originals stay local).
+   Rooms are Derek's renders in museum/rooms/ (web copies; full-size
+   originals stay local), with hotspots traced in 860×480 stage coordinates.
    Hotspot actions:
      { go: 'scene' }        walk to another room
      { sim: 'canary' }      open a staged simulation
@@ -28,6 +28,11 @@ window.MUSEUM_DATA = {
     mall: {
       src: ['museum/audio/mall.ogg', 'museum/audio/mall.m4a'],
       loopEnd: 1867765 / 44100,
+      volume: 0.55,
+    },
+    spacechair: {
+      src: ['museum/audio/spacechair.ogg', 'museum/audio/spacechair.m4a'],
+      loopEnd: 3326400 / 44100,
       volume: 0.55,
     },
   },
@@ -57,6 +62,9 @@ window.MUSEUM_DATA = {
     'eli5': { title: 'ELI5 Corner', scene: 'eli5' },
   },
 
+  /* Rooms. Each hotspot's `poly` is traced around the object in the render
+     ([[x, y], ...] in 860×480 stage coordinates = render pixels ÷ 2).
+     A plain box ({ x, y, w, h }) also works where no tracing is needed. */
   scenes: {
     /* The mall atrium. Exhibit entrances light up only if the exhibit is
        on the current tour; the Front Office is always open. */
@@ -66,34 +74,53 @@ window.MUSEUM_DATA = {
       music: 'mall',
       docent: { x: 548, y: 338 },
       entrances: {
-        'canary-lab': { x: 103, y: 196, w: 146, h: 82, sign: { x: 176, y: 186, text: 'CANARY LAB' },
-                        label: 'Enter the Canary Lab' },
-        'eli5':       { x: 355, y: 274, w: 68, h: 92, sign: { x: 388, y: 258, text: 'ELI5 ↓' },
-                        label: 'Downstairs to the ELI5 Corner' },
+        'canary-lab': {
+          poly: [[103, 163], [249, 175], [249, 262], [103, 272]],
+          sign: { x: 176, y: 186, text: 'CANARY LAB' },
+          label: 'Enter the Canary Lab',
+        },
+        'eli5': {
+          poly: [[380, 268], [411, 259], [423, 362], [366, 366]],
+          sign: { x: 388, y: 258, text: 'ELI5 ↓' },
+          label: 'Downstairs to the ELI5 Corner',
+        },
       },
       always: [
-        { x: 462, y: 240, w: 82, h: 108, sign: { x: 503, y: 226, text: 'FRONT OFFICE ↑' },
+        { poly: [[500, 250], [544, 250], [549, 352], [459, 350]],
+          sign: { x: 503, y: 226, text: 'FRONT OFFICE ↑' },
           label: 'Up the escalator to the Front Office (résumé & contact)', action: { go: 'office' } },
-        { x: 366, y: 368, w: 166, h: 64, label: 'Toss a coin in the fountain',
+        { poly: [[368, 410], [395, 386], [433, 380], [440, 350], [465, 348], [473, 380],
+                 [508, 386], [543, 410], [530, 440], [450, 448], [373, 438]],
+          label: 'Toss a coin in the fountain',
           action: { say: 'You toss a coin in the fountain. Wish granted: one (1) interview. That’s how this works, right?' } },
       ],
       soon: [
-        { x: 288, y: 200, w: 69, h: 76, sign: { x: 323, y: 196, text: 'SOON' }, title: 'Pipeline Factory' },
-        { x: 688, y: 190, w: 70, h: 110, sign: { x: 722, y: 186, text: 'SOON' }, title: 'Listening Booth' },
+        { poly: [[289, 197], [359, 199], [359, 253], [289, 256]],
+          sign: { x: 323, y: 196, text: 'SOON' }, title: 'Pipeline Factory' },
+        { poly: [[694, 187], [750, 179], [750, 281], [694, 273]],
+          sign: { x: 722, y: 186, text: 'SOON' }, title: 'Listening Booth' },
       ],
     },
 
     'canary-lab': {
       title: 'Canary Lab',
       art: 'museum/rooms/spaceship.jpg',
+      music: 'spacechair',
       hotspots: [
-        { x: 468, y: 282, w: 76, h: 60, label: 'Run the canary analysis', action: { sim: 'canary' } },
-        { x: 764, y: 222, w: 82, h: 90, label: 'Canary radar: run the analysis', action: { sim: 'canary' } },
-        { x: 212, y: 306, w: 50, h: 40, label: 'Pull the throttle: deploy the canary', action: { sim: 'canary' } },
-        { x: 44, y: 88, w: 112, h: 118, label: 'Baseline telemetry: the version in production today', action: { sim: 'canary' } },
-        { x: 678, y: 222, w: 80, h: 80, label: 'Mission log (the placard)', action: { placard: 'canary-lab' } },
-        { x: 266, y: 228, w: 62, h: 70, label: 'Explain it like I’m 5', action: { eli5: 'canary' } },
-        { x: 300, y: 432, w: 174, h: 24, label: 'Floor hatch: back to the lobby', action: { go: 'lobby' } },
+        { poly: [[466, 281], [543, 281], [543, 338], [466, 338]],
+          label: 'Run the canary analysis', action: { sim: 'canary' } },
+        { poly: [[765, 225], [853, 222], [856, 335], [767, 334]],
+          label: 'Canary radar: run the analysis', action: { sim: 'canary' } },
+        { poly: [[108, 380], [145, 350], [160, 367], [190, 380], [188, 402], [120, 405]],
+          label: 'Pull the throttle: deploy the canary', action: { sim: 'canary' } },
+        { poly: [[50, 79], [159, 107], [150, 206], [29, 195]],
+          label: 'Baseline telemetry: the version in production today', action: { sim: 'canary' } },
+        { poly: [[671, 228], [760, 226], [761, 311], [672, 310]],
+          label: 'Mission log (the placard)', action: { placard: 'canary-lab' } },
+        { poly: [[250, 228], [329, 229], [330, 299], [252, 300]],
+          label: 'Explain it like I’m 5', action: { eli5: 'canary' } },
+        { poly: [[435, 436], [500, 432], [520, 456], [430, 456]],
+          label: 'Floor hatch: back to the lobby', action: { go: 'lobby' } },
       ],
     },
 
@@ -101,11 +128,15 @@ window.MUSEUM_DATA = {
       title: 'Front Office',
       art: 'museum/rooms/office.jpg',
       hotspots: [
-        { x: 556, y: 328, w: 168, h: 40, label: 'Résumé on the desk (print or save as PDF)', action: { resume: true } },
-        { x: 634, y: 256, w: 108, h: 76, label: 'Computer: contact.txt', action: { window: 'contact' } },
-        { x: 468, y: 274, w: 58, h: 88, label: 'Globe: About Derek', action: { window: 'about' } },
-        { x: 352, y: 290, w: 96, h: 56, label: 'Bookshelf: skills.json', action: { window: 'skills' } },
-        { x: 0, y: 250, w: 170, h: 170, label: 'Back to the lobby', action: { go: 'lobby' } },
+        { poly: [[553, 352], [570, 349], [650, 333], [722, 342], [660, 366], [651, 370], [632, 384], [555, 375]],
+          label: 'Résumé on the desk (print or save as PDF)', action: { resume: true } },
+        { poly: [[639, 263], [705, 260], [707, 306], [715, 307], [716, 326], [634, 329], [633, 308], [640, 308]],
+          label: 'Computer: contact.txt', action: { window: 'contact' } },
+        { poly: [[470, 300], [478, 282], [498, 275], [518, 282], [525, 302], [518, 322], [503, 330],
+                 [505, 350], [515, 361], [483, 362], [493, 350], [493, 331], [478, 322]],
+          label: 'Globe: About Derek', action: { window: 'about' } },
+        { poly: [[353, 300], [447, 285], [449, 332], [356, 350]],
+          label: 'Bookshelf: skills.json', action: { window: 'skills' } },
       ],
     },
 
@@ -113,11 +144,14 @@ window.MUSEUM_DATA = {
       title: 'ELI5 Corner',
       art: 'museum/rooms/basement.jpg',
       hotspots: [
-        { x: 472, y: 240, w: 72, h: 106, label: 'TV: play “What is a canary release?”', action: { eli5: 'canary' } },
-        { x: 678, y: 204, w: 158, h: 150, label: 'Old Mac: every ELI5 tape', action: { eli5Index: true } },
-        { x: 184, y: 424, w: 120, h: 32, label: 'A VHS tape labeled “next episode” (coming soon)',
-          action: { eli5Index: true } },
-        { x: 476, y: 118, w: 180, h: 122, label: 'Back upstairs to the lobby', action: { go: 'lobby' } },
+        { poly: [[474, 240], [542, 241], [543, 345], [474, 346]],
+          label: 'TV: play “What is a canary release?”', action: { eli5: 'canary' } },
+        { poly: [[682, 205], [830, 210], [835, 350], [681, 350]],
+          label: 'Old Mac: every ELI5 tape', action: { eli5Index: true } },
+        { poly: [[186, 442], [235, 431], [241, 445], [192, 456]],
+          label: 'A VHS tape labeled “next episode” (coming soon)', action: { eli5Index: true } },
+        { poly: [[548, 120], [652, 85], [652, 280], [550, 295]],
+          label: 'Back upstairs to the lobby', action: { go: 'lobby' } },
       ],
     },
   },

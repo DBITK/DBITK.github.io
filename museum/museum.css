@@ -85,22 +85,34 @@
 .m-resume li, .m-resume p { font-size: 10.5px; margin-bottom: 2px; }
 .m-resume .r-skills-grid div { font-size: 10.5px; margin-bottom: 2px; }
 
-/* Hotspots: invisible until hovered, then a 90s glow outline */
-.m-hotspot {
+/* Hotspots: SVG polygons traced around each object. Invisible until
+   hovered or focused, then the object's outline glows, 90s style. */
+.m-hotspots, .m-hotsvg {
   position: absolute;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 4px;
-  padding: 0;
+  inset: 0;
+  width: 860px;
+  height: 480px;
+}
+.m-hotsvg { overflow: visible; }
+.m-hot {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  pointer-events: all;
   outline: none;
-  transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+  transition: fill 0.12s, stroke 0.12s;
 }
-.m-hotspot:hover, .m-hotspot:focus-visible {
-  border-color: #ffe14d;
-  box-shadow: 0 0 0 1px #000, 0 0 14px rgba(255, 225, 77, 0.7);
-  background: rgba(255, 225, 77, 0.08);
+.m-hot:hover, .m-hot:focus-visible {
+  fill: rgba(255, 225, 77, 0.10);
+  stroke: #ffe14d;
+  filter: drop-shadow(0 0 4px rgba(255, 225, 77, 0.9));
 }
-.m-hotspot.m-closed:hover { border-color: #888; box-shadow: none; background: rgba(0,0,0,0.15); }
+.m-hot.m-closed:hover, .m-hot.m-closed:focus-visible {
+  fill: rgba(0, 0, 0, 0.18);
+  stroke: #9a9a9a;
+  filter: none;
+}
 
 /* Status bar along the bottom, like a CD-ROM title */
 .m-status {
